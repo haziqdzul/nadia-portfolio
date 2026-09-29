@@ -1,207 +1,105 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useId, useRef, useState, type ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ArrowDown, ArrowUpRight, LayoutGrid, List, X } from "lucide-react";
+import { categories, reportProjects, skillGroups, type Category, type Skill } from "@/lib/projects";
+import { ProjectVisual } from "@/components/project-visual";
 
-
-const categories = ["All", "Requirements", "Data engineering", "Dashboards", "Training & UAT", "Analysis"] as const;
-type Category = (typeof categories)[number];
-const skillGroups = [
-  { title: "Business analysis", skills: ["Requirements", "SME workshops", "Process mapping", "Thematic analysis"] },
-  { title: "Data", skills: ["SQL", "Oracle", "Doris / StarRocks", "Data modelling", "Data cleaning", "Data readiness"] },
-  { title: "Visualisation", skills: ["Tableau", "Power BI"] },
-  { title: "Delivery", skills: ["UAT", "Training", "Statistics", "ESG analysis"] },
-] as const;
-type Skill = (typeof skillGroups)[number]["skills"][number];
-type Visual = "timeline" | "mapping" | "matrix" | "scatter" | "heat";
-export type ReportProject = Readonly<{
-  id: string;
-  client: string;
-  title: string;
-  description: string;
-  categories: readonly Exclude<Category, "All">[];
-  skills: readonly Skill[];
-  highlights: readonly string[];
-  visual: Visual;
-}>;
-
-// Project facts supplied by the linked reference. Visual samples are illustrative.
-export const reportProjects: readonly ReportProject[] = [
-  {
-    id: "statsdw", client: "Department of Statistics Malaysia · STATSDW",
-    title: "Rolling out a national statistics data warehouse",
-    description: "Supported requirements, data readiness, user training, UAT, and rollout for DOSM, including a two-day expansion workshop and follow-up coaching.",
-    categories: ["Requirements", "Training & UAT"],
-    skills: ["Requirements", "Data readiness", "SME workshops", "Training", "UAT"],
-    highlights: ["Go-live · June 2025", "FAT · July 2025", "Two-day workshop"], visual: "timeline",
-  },
-  {
-    id: "oracle", client: "Public-sector health data programme",
-    title: "Migrating a data warehouse schema to Oracle",
-    description: "Adapted Doris and StarRocks schemas for vaccine forecasting into Oracle DDL, standardizing type mappings and documenting source inconsistencies for review.",
-    categories: ["Data engineering"], skills: ["SQL", "Oracle", "Doris / StarRocks", "Data modelling"],
-    highlights: ["Kuala Lumpur", "Labuan", "Putrajaya"], visual: "mapping",
-  },
-  {
-    id: "enforcement", client: "Federal enforcement agency",
-    title: "Turning SME knowledge into nine use cases",
-    description: "Organized subject-matter expert input into a seven-column thematic framework and mapped nine use cases to make requirements and processes explicit.",
-    categories: ["Requirements"], skills: ["SME workshops", "Thematic analysis", "Requirements", "Process mapping"],
-    highlights: ["Seven-column framework", "Nine use cases"], visual: "matrix",
-  },
-  {
-    id: "cidb", client: "CIDB Malaysia",
-    title: "Profiling consultant performance in construction",
-    description: "Prepared consultant records and built Tableau views to support consistent comparisons of consultant performance for the Construction Industry Development Board.",
-    categories: ["Data engineering", "Dashboards"], skills: ["Tableau", "Data cleaning", "Statistics"],
-    highlights: ["Consultant comparisons", "Performance profiling"], visual: "scatter",
-  },
-  {
-    id: "esg", client: "MCIS Insurance Berhad · Internship",
-    title: "ESG and climate risk analysis for an insurer",
-    description: "Applied statistical methods to ESG and climate-risk questions during an insurance internship, supporting sustainability analysis.",
-    categories: ["Analysis"], skills: ["Statistics", "ESG analysis"],
-    highlights: ["ESG analysis", "Climate risk"], visual: "heat",
-  },
-];
-
-function ProjectVisual({ kind }: Readonly<{ kind: Visual }>) {
-  const surface = "rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950/60";
-  if (kind === "timeline") return (
-    <div className={surface}>
-      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Delivery · 2025</p>
-      <ol className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        {[ ["Feb", "Training"], ["Mar", "UAT"], ["Apr", "PAT / TOT / TOK"], ["Jun", "Go-live"], ["Jul", "FAT"] ].map(([month, label]) => (
-          <li key={month} className="border-l-2 border-violet-400 pl-3 text-xs leading-5"><span className="block font-bold text-violet-700 dark:text-violet-300">{month}</span>{label}</li>
-        ))}
-      </ol>
-    </div>
-  );
-  if (kind === "mapping") return (
-    <div className={surface}>
-      <table className="w-full text-left text-xs leading-6">
-        <caption className="mb-3 text-left font-semibold">Schema type mapping</caption>
-        <thead><tr><th scope="col">Doris / StarRocks</th><th scope="col">Oracle</th></tr></thead>
-        <tbody>{[["datetime", "DATE / TIMESTAMP"], ["double", "NUMBER"], ["Identifiers", "Oracle naming rules"], ["Source issues", "Flagged for review"]].map(([source, target]) => (
-          <tr key={source} className="border-t border-slate-200 dark:border-slate-700"><td className="py-1 pr-3">{source}</td><td className="py-1">{target}</td></tr>
-        ))}</tbody>
-      </table>
-    </div>
-  );
-  if (kind === "matrix") return (
-    <div className={surface}>
-      <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">Structure only · nine use cases × seven columns</p>
-      <div role="img" aria-label="Structural illustration: nine rows of use cases and seven framework columns" className="grid grid-cols-7 gap-1.5">
-        {Array.from({ length: 63 }, (_, i) => <span key={i} className={`h-3 rounded-sm ${i % 3 === 0 ? "bg-violet-400 dark:bg-violet-500" : "bg-violet-100 dark:bg-violet-900/50"}`} />)}
-      </div>
-    </div>
-  );
-  if (kind === "scatter") return (
-    <div className={surface}>
-      <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">Illustrative profiles · not client data</p>
-      <svg role="img" aria-label="Illustrative consultant profiles spread across four quadrants; no actual scores shown" viewBox="0 0 320 120" className="h-32 w-full">
-        <path d="M20 60H300M160 8V112" className="stroke-slate-300 dark:stroke-slate-600" strokeDasharray="4 4" />
-        {Array.from({ length: 18 }, (_, i) => <circle key={i} cx={30 + (i * 47) % 260} cy={15 + (i * 31) % 90} r="4" className="fill-cyan-600 dark:fill-cyan-400" />)}
-      </svg>
-    </div>
-  );
-  return (
-    <div className={surface}>
-      <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">Illustrative climate-risk view · not client data</p>
-      <div role="img" aria-label="Illustrative risk heatmap across three time horizons; colors do not represent actual findings" className="grid grid-cols-6 gap-2">
-        {Array.from({ length: 18 }, (_, i) => <span key={i} className={`h-7 rounded ${["bg-rose-200 dark:bg-rose-900", "bg-rose-300 dark:bg-rose-700", "bg-rose-400 dark:bg-rose-500"][i % 3]}`} />)}
-      </div>
-      <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Near term → medium term → long term</p>
-    </div>
-  );
-}
+export { reportProjects, type ReportProject } from "@/lib/projects";
+const ProjectCaseStudy = dynamic(() => import("@/components/project-case-study").then((module) => module.ProjectCaseStudy), {
+  loading: () => <p role="status" className="py-8">Opening project evidence…</p>,
+});
 
 export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: ReactNode }>) {
   const id = useId();
+  const reduce = useReducedMotion();
   const [category, setCategory] = useState<Category>("All");
   const [skill, setSkill] = useState<Skill | null>(null);
-  const portfolioRef = useRef<HTMLElement>(null);
-  const reducedMotion = useReducedMotion();
-  const visible = reportProjects.filter((project) =>
-    (category === "All" || project.categories.includes(category)) &&
-    (skill === null || project.skills.includes(skill)),
-  );
-  const countSkill = (value: Skill) => reportProjects.filter((project) => project.skills.includes(value)).length;
-  const chip = "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors";
-  const active = "border-violet-700 bg-violet-700 text-white dark:border-violet-300 dark:bg-violet-300 dark:text-slate-950";
-  const inactive = "border-slate-200 bg-white/70 text-slate-700 hover:border-violet-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200";
+  const [evidenceSkill, setEvidenceSkill] = useState<Skill>("SQL");
+  const [view, setView] = useState<"workspace" | "list">("workspace");
+  const [selected, setSelected] = useState<string | null>(null);
+  const projectButtons = useRef(new Map<string, HTMLButtonElement>());
+  const portfolioHeading = useRef<HTMLHeadingElement>(null);
+  const visible = reportProjects.filter((project) => (category === "All" || project.categories.includes(category)) && (skill === null || project.skills.includes(skill)));
+  const selectedProject = reportProjects.find((project) => project.id === selected);
+  const evidence = reportProjects.filter((project) => project.skills.includes(evidenceSkill));
 
-  function selectSkill(value: Skill) {
-    setCategory("All");
-    setSkill((current) => current === value ? null : value);
-    portfolioRef.current?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "start" });
+  function closeCase() {
+    const previous = selected;
+    setSelected(null);
+    if (previous) projectButtons.current.get(previous)?.focus();
+  }
+  function resetFilters() { setCategory("All"); setSkill(null); setSelected(null); }
+  function filterBySkill() {
+    setCategory("All"); setSkill(evidenceSkill); setSelected(null);
+    portfolioHeading.current?.focus({ preventScroll: true });
+    portfolioHeading.current?.scrollIntoView({ behavior: reduce ? "instant" : "smooth", block: "start" });
   }
 
-  return (
-    <>
-      <section ref={portfolioRef} id="portfolio" aria-labelledby={`${id}-portfolio-heading`} className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">Selected work</p>
-        <h2 id={`${id}-portfolio-heading`} className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">Projects, filterable like a report</h2>
-        <p className="mt-5 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">Use the slicer to filter by type of work, or pick a skill further down to cross-filter these cards.</p>
-
-        <fieldset className="mt-8">
-          <legend className="mb-3 text-sm font-semibold">Filter by type of work</legend>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((item) => {
-              const count = reportProjects.filter((project) => item === "All" || project.categories.includes(item)).length;
-              return <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => setCategory(item)} className={`${chip} ${category === item ? active : inactive}`}>{item}<span className="font-mono text-xs">{count}</span></button>;
-            })}
-          </div>
-        </fieldset>
-
-        <div className="my-5 flex min-h-11 flex-wrap items-center justify-between gap-3">
-          <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-slate-600 dark:text-slate-400">Showing {visible.length} of {reportProjects.length} projects{category !== "All" ? ` · ${category}` : ""}{skill ? ` · skill: ${skill}` : ""}</p>
-          <div className="flex flex-wrap gap-2">
-            {skill && <button type="button" onClick={() => setSkill(null)} className={`${chip} ${inactive}`} aria-label={`Clear skill filter: ${skill}`}>Skill: {skill} <span aria-hidden="true">×</span></button>}
-            {(skill || category !== "All") && <button type="button" onClick={() => { setCategory("All"); setSkill(null); }} className="min-h-11 rounded-lg px-3 text-sm font-semibold text-violet-700 underline underline-offset-4 dark:text-violet-300">Reset filters</button>}
-          </div>
-        </div>
-
-        <div id={`${id}-results`}>
-          {visible.length ? (
-            <ul className="grid items-start gap-5 md:grid-cols-2">
-              {visible.map((project) => (
-                <motion.li key={project.id} layout={reducedMotion ? false : "position"} initial={false} animate={{ opacity: 1 }} transition={{ duration: reducedMotion ? 0 : 0.25 }} className={project.id === "statsdw" ? "md:col-span-2" : ""}>
-                  <article className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-violet-50 via-white to-cyan-50 p-6 shadow-sm sm:p-8 dark:border-slate-800 dark:from-violet-950/30 dark:via-slate-900 dark:to-cyan-950/20">
-                    <ProjectVisual kind={project.visual} />
-                    <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-violet-700 dark:text-violet-300">{project.client}</p>
-                    <h3 className="mt-3 text-2xl font-bold tracking-tight">{project.title}</h3>
-                    <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">{project.description}</p>
-                    <ul aria-label="Project highlights" className="mt-5 flex flex-wrap gap-2">{project.highlights.map((highlight) => <li key={highlight} className="rounded-lg bg-violet-100/70 px-3 py-2 text-xs font-medium dark:bg-violet-400/10">{highlight}</li>)}</ul>
-                    <ul aria-label="Related skills" className="mt-4 flex flex-wrap gap-2">{project.skills.map((tag) => <li key={tag}><button type="button" aria-pressed={skill === tag} aria-controls={`${id}-results`} onClick={() => selectSkill(tag)} className={`${chip} ${skill === tag ? active : inactive}`}>{tag}</button></li>)}</ul>
-                  </article>
-                </motion.li>
-              ))}
-            </ul>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-slate-300 p-10 text-center dark:border-slate-700">
-              <h3 className="text-lg font-semibold">No projects match both filters.</h3>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Clear the skill filter or reset all filters to see more work.</p>
-              <button type="button" onClick={() => { setCategory("All"); setSkill(null); }} className={`${chip} ${active} mt-5`}>Show all projects</button>
+  return <>
+    <section id="portfolio" aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+      <div className="flex flex-wrap items-end justify-between gap-6">
+        <div><p className="eyebrow">01 / Project sandbox</p><h2 ref={portfolioHeading} tabIndex={-1} id={`${id}-heading`} className="section-heading mt-4">Every project.<br />A different way to find clarity.</h2></div>
+        <p className="max-w-sm text-sm leading-7 text-slate-600 dark:text-slate-400">Filter like a report. Open a project to follow the thinking, explore its transformation, and examine the evidence.</p>
+      </div>
+      <div className="mt-10 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-800 dark:bg-slate-900/40">
+        <fieldset><legend className="eyebrow mb-4">Slice by type of work</legend><div className="flex flex-wrap gap-2">
+          {categories.map((item) => <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => { setCategory(item); setSelected(null); }} className={`filter-button ${category === item ? "filter-active" : "filter-idle"}`}>{item}<span className="font-mono text-xs opacity-75">{reportProjects.filter((p) => (item === "All" || p.categories.includes(item)) && (!skill || p.skills.includes(skill))).length}</span></button>)}
+        </div></fieldset>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <p role="status" aria-atomic="true" className="font-mono text-xs text-slate-600 dark:text-slate-400">{String(visible.length).padStart(2, "0")} / 05 projects{skill ? ` · ${skill}` : ""}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {skill && <button type="button" onClick={() => { setSkill(null); setSelected(null); }} className="filter-button filter-idle" aria-label={`Clear ${skill} skill filter`}>{skill}<X className="size-3" aria-hidden="true" /></button>}
+            {(skill || category !== "All") && <button type="button" onClick={resetFilters} className="min-h-11 px-3 text-xs underline underline-offset-4">Reset filters</button>}
+            <div className="flex gap-1" aria-label="Project display">
+              <button type="button" aria-pressed={view === "workspace"} onClick={() => setView("workspace")} className={`filter-button ${view === "workspace" ? "filter-active" : "filter-idle"}`}><LayoutGrid aria-hidden="true" className="size-4" /><span className="hidden sm:inline">Workspace</span><span className="sr-only sm:hidden">Workspace</span></button>
+              <button type="button" aria-pressed={view === "list"} onClick={() => setView("list")} className={`filter-button ${view === "list" ? "filter-active" : "filter-idle"}`}><List aria-hidden="true" className="size-4" />List</button>
             </div>
-          )}
-        </div>
-      </section>
-
-      <section id="skills" aria-labelledby={`${id}-skills-heading`} className="border-y border-violet-100 bg-violet-50/70 py-16 dark:border-slate-800 dark:bg-slate-900/50">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">Skills</p>
-          <h2 id={`${id}-skills-heading`} className="text-3xl font-bold tracking-tight sm:text-4xl">Tools and methods, linked to real projects</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">Each number counts all projects using that skill. Choose a skill to show its projects; choosing it again clears the selection.</p>
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {skillGroups.map((group) => <div key={group.title} className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-950"><h3 className="mb-4 font-bold">{group.title}</h3><ul className="flex flex-wrap gap-2">{group.skills.map((item) => {
-              const count = countSkill(item);
-              return <li key={item}>{count ? <button type="button" aria-label={`Filter by ${item}: ${count} projects`} aria-pressed={skill === item} aria-controls={`${id}-results`} onClick={() => selectSkill(item)} className={`${chip} ${skill === item ? active : inactive}`}>{item}<span className="font-mono text-xs">{count}</span></button> : <span className="inline-flex min-h-11 items-center px-3 text-sm text-slate-500 dark:text-slate-400">{item}<span className="sr-only">: no linked projects</span></span>}</li>;
-            })}</ul></div>)}
           </div>
-          {skillsFooter}
         </div>
-      </section>
-    </>
-  );
+      </div>
+      <div id={`${id}-results`} className="mt-5">
+        <ul className={`grid gap-4 ${view === "workspace" ? "md:grid-cols-2" : "grid-cols-1"}`}>
+          <AnimatePresence initial={false}>
+            {visible.map((project, index) => <motion.li key={project.id} layout={reduce ? false : "position"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }} className={view === "workspace" && project.id === "statsdw" ? "md:col-span-2" : ""}>
+              <button ref={(node) => { if (node) projectButtons.current.set(project.id, node); else projectButtons.current.delete(project.id); }} type="button" aria-expanded={selected === project.id} aria-controls={selected === project.id ? `${id}-case` : undefined} onClick={() => selected === project.id ? closeCase() : setSelected(project.id)} className={`group h-full w-full rounded-xl border p-6 text-left transition-[border-color,box-shadow] duration-200 hover:border-emerald-600 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:border-emerald-400 ${selected === project.id ? "border-emerald-600 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-950/30" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40"}`}>
+                <div className={`grid items-center gap-6 ${view === "workspace" && project.id === "statsdw" ? "lg:grid-cols-2" : ""}`}>
+                  <div><div className="flex items-start justify-between gap-3"><p className="eyebrow leading-5">{project.client}</p><span className="font-mono text-xs text-slate-500 dark:text-slate-400">0{index + 1}</span></div>
+                  <h3 className={`mt-4 font-semibold leading-snug tracking-tight ${view === "workspace" ? "text-2xl" : "text-xl"}`}>{project.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-400">{project.description}</p>
+                  <p className="mt-4 text-xs font-medium text-emerald-800 dark:text-emerald-300">{project.highlights.join(" / ")}</p>
+                  <span className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-700"><span className="text-xs text-slate-600 dark:text-slate-400">{project.skills.slice(0, 3).join(" · ")}</span><span className="flex shrink-0 items-center gap-1 text-xs font-semibold">{selected === project.id ? "Close" : "Explore"}<ArrowUpRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" /></span></span></div>
+                  {view === "workspace" && <div aria-hidden="true" className="pointer-events-none"><ProjectVisual kind={project.visual} /></div>}
+                </div>
+              </button>
+            </motion.li>)}
+          </AnimatePresence>
+        </ul>
+        {visible.length === 0 && <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center dark:border-slate-700"><h3 className="text-xl font-semibold">No projects match both filters.</h3><button type="button" onClick={resetFilters} className="action-button mt-5">Show all projects</button></div>}
+      </div>
+      {selectedProject && <div id={`${id}-case`}><ProjectCaseStudy key={selectedProject.id} project={selectedProject} onClose={closeCase} /></div>}
+    </section>
+
+    <section id="skills" aria-labelledby={`${id}-skills`} className="border-y border-slate-200 bg-slate-100/60 py-20 sm:py-24 dark:border-slate-800 dark:bg-slate-900/30">
+      <div className="mx-auto max-w-6xl px-6">
+        <p className="eyebrow">02 / Capability → evidence</p><h2 id={`${id}-skills`} className="section-heading mt-4">Skills are a starting point.<br />The work is the evidence.</h2>
+        <p className="mt-5 max-w-2xl leading-7 text-slate-600 dark:text-slate-400">Choose a capability to see where I have used it. The connections below come from the projects in this portfolio.</p>
+        <div className="mt-9 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <div className="grid gap-5 sm:grid-cols-2">{skillGroups.map((group, index) => <div key={group.title} className="border-t border-slate-300 pt-5 dark:border-slate-700"><h3 className="mb-3 flex items-center gap-3 text-sm font-semibold"><span className="font-mono text-xs text-emerald-700 dark:text-emerald-300">0{index + 1}</span>{group.title}</h3><ul className="flex flex-wrap gap-2">{group.skills.map((item) => {
+            const count = reportProjects.filter((p) => p.skills.includes(item)).length;
+            return <li key={item}><button type="button" aria-pressed={evidenceSkill === item} aria-controls={`${id}-evidence`} onClick={() => setEvidenceSkill(item)} className={`filter-button ${evidenceSkill === item ? "filter-active" : "filter-idle"}`}>{item}<span className="font-mono text-xs opacity-75">{count}</span></button></li>;
+          })}</ul></div>)}</div>
+          <div id={`${id}-evidence`} className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
+            <div className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-full border border-emerald-700/30 font-mono text-xs text-emerald-800 dark:text-emerald-300">NI</span><span aria-hidden="true" className="h-px flex-1 bg-emerald-700/30" /><span className="text-sm font-semibold">{evidenceSkill}</span></div>
+            <p role="status" className="mt-6 text-sm text-slate-600 dark:text-slate-400">{evidence.length ? `${evidence.length} linked ${evidence.length === 1 ? "project" : "projects"}` : "No published project evidence yet"}</p>
+            <ul className="mt-3 space-y-3">{evidence.map((p) => <li key={p.id} className="relative border-l-2 border-emerald-600 pl-4"><p className="text-sm font-semibold leading-6">{p.title}</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{p.client}</p></li>)}</ul>
+            {evidence.length ? <button type="button" onClick={filterBySkill} className="action-button mt-6">Filter projects by {evidenceSkill}<ArrowDown aria-hidden="true" className="size-4 rotate-180" /></button> : <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-400">This tool is listed in my toolkit; a case study demonstrating it has not been added.</p>}
+          </div>
+        </div>
+        {skillsFooter}
+      </div>
+    </section>
+  </>;
 }

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+
 import { Hero } from "@/components/hero";
 import { ReportProjects } from "@/components/report-projects";
 import { CurrentlyBuilding } from "@/components/currently-building";
@@ -11,18 +11,19 @@ export default function HomePage() {
   return (
     <main id="main-content" tabIndex={-1} className="flex-1">
       <Hero />
-      <DeliveryLifecycle />
+
       <ReportProjects skillsFooter={<CurrentlyBuilding className="mt-6" />} />
+      <DeliveryLifecycle />
       <CareerTimeline />
      
       <section
         id="about"
         aria-labelledby="about-heading"
-        className="border-y border-violet-100 bg-violet-50/70 py-20 sm:py-24 dark:border-slate-800 dark:bg-slate-900/50"
+        className="border-y border-slate-200 bg-slate-100/60 py-20 sm:py-24 dark:border-slate-800 dark:bg-slate-900/50"
       >
         <div className="mx-auto grid max-w-6xl gap-8 px-6 md:grid-cols-2 md:gap-16">
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-800 dark:text-emerald-300">
               A little about me
             </p>
             <h2
@@ -56,3 +57,4 @@ export default function HomePage() {
     </main>
   );
 }
+

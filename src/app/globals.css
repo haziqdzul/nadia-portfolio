@@ -1,82 +1,29 @@
 @import "tailwindcss";
-
 @custom-variant dark (&:where(.dark, .dark *));
-
 @theme inline {
   --font-sans: var(--font-inter);
   --font-heading: var(--font-jakarta);
 }
-
 @layer base {
-  body {
-    @apply bg-slate-50 font-sans text-slate-900 antialiased;
-    @apply dark:bg-slate-950 dark:text-slate-100;
-  }
-
-  h1,
-  h2,
-  h3 {
-    @apply font-heading;
-  }
-
-  [id] {
-    scroll-margin-top: 6rem;
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--color-violet-500);
-    outline-offset: 5px;
-  }
-
-  ::selection {
-    @apply bg-violet-200 text-slate-950;
-  }
+  body { @apply bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100; }
+  h1, h2, h3 { @apply font-heading; }
+  [id] { scroll-margin-top: 7rem; }
+  :focus-visible { outline: 2px solid var(--color-emerald-600); outline-offset: 5px; }
+  ::selection { @apply bg-emerald-200 text-slate-950; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled) { cursor: pointer; }
 }
-
+@layer components {
+  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-400; }
+  .section-heading { @apply max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl lg:text-5xl; }
+  .action-button { @apply inline-flex min-h-12 items-center justify-center gap-3 rounded-lg bg-slate-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-200 dark:text-slate-950 dark:hover:bg-emerald-300; }
+  .filter-button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors; }
+  .filter-active { @apply border-emerald-800 bg-emerald-800 text-white dark:border-emerald-200 dark:bg-emerald-200 dark:text-slate-950; }
+  .filter-idle { @apply border-slate-200 bg-white text-slate-700 hover:border-emerald-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-emerald-400; }
+}
 @media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 }
-
-@keyframes iconTwist {
-  0%, 100% { transform: rotate(0deg); }
-  10% { transform: rotate(40deg); }
-  20% { transform: rotate(-40deg); }
-  30% { transform: rotate(30deg); }
-  40% { transform: rotate(-30deg); }
-  50% { transform: rotate(20deg); }
-  60% { transform: rotate(-20deg); }
-  70%, 90% { transform: rotate(0deg); }
-}
-
-/* New custom micro-bounce sequence for your tagline */
-@keyframes microBounce {
-  0%, 70%, 100% { transform: translateY(0); }
-  25% { transform: translateY(-3px); }  /* A crisp, clean 3px upward hop */
-  45% { transform: translateY(1px); }   /* Subtle cushioning bounce */
-}
-
-@keyframes dataFlow {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0%); }
-}
-
-.animate-data-flow {
-  animation: dataFlow 15s linear infinite;
-}
-
-@keyframes matchaRipple {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1.25); /* Expands out 25% past the button edges */
-    opacity: 0;
-  }
-}
-
-.animate-matcha-ripple {
-  animation: matchaRipple 1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

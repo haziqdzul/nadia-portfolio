@@ -124,9 +124,9 @@ export function DeliveryLifecycle() {
   return (
     <section ref={sectionRef} id="how" aria-labelledby={`${id}-heading`} className="scroll-mt-20 bg-slate-50 py-20 text-slate-900 dark:bg-[#0b0f17] dark:text-zinc-100 sm:py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">How I work</p>
+        <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">03 / How I work</p>
         <div className="mb-9 flex flex-wrap items-end justify-between gap-6">
-          <h2 id={`${id}-heading`} className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">One analyst, the full delivery lifecycle</h2>
+          <h2 id={`${id}-heading`} className="section-heading">One analyst, the full delivery lifecycle</h2>
           <div className="flex shrink-0 items-center gap-3">
             <span className="flex items-center gap-2 text-xs text-slate-600 dark:text-zinc-400"><span aria-hidden="true" className={`size-1.5 rounded-full ${isPlaying ? "bg-emerald-600 dark:bg-emerald-300" : "bg-zinc-500"}`} />{isPlaying ? "Auto-playing" : "Paused"}</span>
             <button type="button" onClick={() => setPlayback(!isPlaying)} aria-controls={`${id}-panel`} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white dark:border-white/15 dark:bg-white/5 px-4 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 motion-reduce:transition-none">
@@ -187,3 +187,4 @@ export function DeliveryLifecycle() {
     </section>
   );
 }
+

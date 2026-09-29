@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Nadia Irdina",
   },
   description:
-    "Developer and designer creating thoughtful, accessible digital experiences.",
+    "Nadia Irdina is a Malaysia-based BI analyst translating business requirements and complex data into clear dashboards, structured systems, and practical decisions.",
 };
 
 type RootLayoutProps = Readonly<{
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Providers>
           <a
             href="#main-content"
-            className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-violet-700 px-5 py-3 font-semibold text-white focus:not-sr-only"
+            className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white focus:not-sr-only"
           >
             Skip to content
           </a>

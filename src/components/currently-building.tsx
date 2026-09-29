@@ -12,9 +12,9 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
   return (
     <aside
       aria-label="Currently building"
-      className={`flex flex-col gap-4 rounded-2xl border border-violet-200/70 bg-white/75 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 dark:border-slate-700 dark:bg-slate-950/60 ${className}`}
+      className={`flex flex-col gap-4 rounded-xl border border-emerald-200/70 bg-white/75 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 dark:border-slate-700 dark:bg-slate-950/60 ${className}`}
     >
-      <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-wider text-violet-700 dark:text-violet-300">
+      <p className="shrink-0 font-mono text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
         Currently building
       </p>
       <ul className="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-x-6">
@@ -27,7 +27,7 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
               {Array.from({ length: 7 }, (_, index) => (
                 <span
                   key={index}
-                  className="h-1.5 w-1 rounded-[1px] bg-violet-500 dark:bg-violet-300"
+                  className="h-1.5 w-1 rounded-[1px] bg-emerald-500 dark:bg-emerald-300"
                 />
               ))}
             </span>
@@ -38,3 +38,4 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
     </aside>
   );
 }
+
