@@ -3,12 +3,39 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 
 const skills = ["Tableau", "SQL", "Oracle", "Power BI"] as const;
 
+
 export function Hero() {
     const reduceMotion = useReducedMotion();
+    const taglines = [
+        "Transforming Raw Data into Strategic Insights",
+        "Architecting Dashboards That Drive Business Action",
+        "Turning Complex Data into Decisive Strategy",
+        "Converting Massive Datasets into Corporate Value"
+    ];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isVisible, setIsVisible] = useState(true);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // Fade out the old text sequence slightly ahead of time
+            setIsVisible(false);
+
+            setTimeout(() => {
+                // Update the text slice indexing counter
+                setCurrentIndex((prevIndex) => (prevIndex + 1) % taglines.length);
+                // Fade the clean upcoming text choice back into visual baseline
+                setIsVisible(true);
+            }, 800); // 500ms fade transition window
+        }, 6000); // Repeats continuously every 3 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
 
     return (
         <section
@@ -39,7 +66,15 @@ export function Hero() {
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-600 opacity-90" />
                             <span className="relative inline-flex size-2 rounded-full bg-red-500" />
                         </span>
-                        <span>Transforming raw data into strategic insights</span>
+                        <span
+                            className={`
+                                transition-all duration-500 ease-in-out transform
+                                /* Automatically modulates the micro shift and transparency values */
+                                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-1'}
+                            `}
+                        >
+                            {taglines[currentIndex]}
+                        </span>
 
                     </p>
 
@@ -72,21 +107,35 @@ export function Hero() {
                     </ul>
 
                     <div className="mt-9 flex flex-wrap gap-4">
-                        <Link
-                            href="#portfolio"
-                            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-6 font-semibold text-white transition-colors hover:bg-violet-800 dark:bg-white dark:text-slate-950 dark:hover:bg-violet-100"
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            className="inline-block" // prevents layout shift
                         >
-                            Explore my work
-                            <ArrowDown aria-hidden="true" className="size-4" />
-                        </Link>
+                            <Link
+                                href="#portfolio"
+                                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-6 font-semibold text-white transition-colors duration-300 hover:bg-slate-700 dark:bg-white dark:text-slate-950 dark:hover:bg-violet-100"
+                            >
+                                Explore my work
+                                <ArrowDown aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-y-1" />
+                            </Link>
+                        </motion.div>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            className="inline-block" // prevents layout shift
+                        >
+                            <Link
+                                href="#contact"
+                                className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full  border border-slate-300 px-6 font-semibold  transition-colors duration-300 hover:bg-violet-100 dark:border-slate-700 dark:hover:bg-slate-700"
+                            >
+                                Let's talk
+                                <ArrowUpRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-y-1" />
+                            </Link>
+                        </motion.div>
 
-                        <Link
-                            href="#contact"
-                            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-300 px-6 font-semibold transition-colors hover:bg-white/60 dark:border-slate-700 dark:hover:bg-slate-900"
-                        >
-                            Let’s talk
-                            <ArrowUpRight aria-hidden="true" className="size-4" />
-                        </Link>
                     </div>
                 </motion.div>
 

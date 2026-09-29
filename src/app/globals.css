@@ -38,3 +38,45 @@
     scroll-behavior: smooth;
   }
 }
+
+@keyframes iconTwist {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(40deg); }
+  20% { transform: rotate(-40deg); }
+  30% { transform: rotate(30deg); }
+  40% { transform: rotate(-30deg); }
+  50% { transform: rotate(20deg); }
+  60% { transform: rotate(-20deg); }
+  70%, 90% { transform: rotate(0deg); }
+}
+
+/* New custom micro-bounce sequence for your tagline */
+@keyframes microBounce {
+  0%, 70%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }  /* A crisp, clean 3px upward hop */
+  45% { transform: translateY(1px); }   /* Subtle cushioning bounce */
+}
+
+@keyframes dataFlow {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-data-flow {
+  animation: dataFlow 15s linear infinite;
+}
+
+@keyframes matchaRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.25); /* Expands out 25% past the button edges */
+    opacity: 0;
+  }
+}
+
+.animate-matcha-ripple {
+  animation: matchaRipple 1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
