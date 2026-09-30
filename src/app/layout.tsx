@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
-import "../src/app/globals.css";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
