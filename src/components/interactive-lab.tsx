@@ -2,10 +2,10 @@
 
 import { useId } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DataTransformation } from "./data-transformation";
-import { BIMetricPlayground } from "./bi-metric-playground";
+import { PolicySimulator } from "./policy-simulator";
 
-const labTitles = ["Is this data ready for review?", "BI Metric Playground"] as const;
+
+const labTitles = ["Fuel Subsidy Optimization Matrix", "Demographic Allocation Logic"] as const;
 
 export type InteractiveLabProps = Readonly<{
   index: number;
@@ -34,12 +34,13 @@ export function InteractiveLab({ index, onSelect }: InteractiveLabProps) {
     <div id={`${id}-panels`} className="grid min-w-0">
       {/* Stack both panels in one grid cell to reserve their full height without internal scrolling. */}
       <div className="col-start-1 row-start-1 min-w-0" inert={index !== 0} aria-hidden={index !== 0 || undefined} style={{ visibility: index === 0 ? "visible" : "hidden" }}>
-        <DataTransformation />
+        <PolicySimulator kind="fuel" />
       </div>
       <div inert={index !== 1} aria-hidden={index !== 1 || undefined} className="col-start-1 row-start-1 min-w-0" style={{ visibility: index === 1 ? "visible" : "hidden" }}>
-        <BIMetricPlayground />
+        <PolicySimulator kind="capacity" />
       </div>
     </div>
   </section>;
 }
+
 

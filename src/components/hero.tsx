@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 import { InteractiveLab } from "./interactive-lab";
 import { HeroIntro } from "./hero-intro";
+import { PolicyContext } from "./policy-simulator";
 
 export function Hero() {
   const [labIndex, setLabIndex] = useState(0);
@@ -27,6 +28,7 @@ export function Hero() {
               I’m Nadia Irdina, a Business Intelligence Analyst. I translate business questions into structured requirements, dependable data, and decision-ready dashboards.
             </p>
             
+            <PolicyContext index={labIndex} />
             {/* Action Buttons Container */}
             <div className="mt-6 flex flex-wrap items-center gap-4 w-full">
               <Link href="#portfolio" className="action-button">
@@ -102,4 +104,5 @@ export function Hero() {
     </section>
   );
 }
+
 
