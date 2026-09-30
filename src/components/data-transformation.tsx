@@ -1,67 +1,81 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
-import { ArrowRight } from "lucide-react";
-
-const stages = [
-  { title: "Raw data", detail: "Many inputs. No shared picture.", label: "Find the signal" },
-  { title: "Structure", detail: "Consistent fields. A common language.", label: "Connect the evidence" },
-  { title: "Insight", detail: "Relationships become visible.", label: "Make it actionable" },
-  { title: "Decision", detail: "A clear question. An informed next step.", label: "Explore again" },
-] as const;
-
-// Deterministic positions keep the server and first client render identical.
-function point(index: number, stage: number) {
-  if (stage === 0) return { x: 36 + (index * 71) % 328, y: 35 + (index * 47) % 154 };
-  if (stage === 1) return { x: 64 + (index % 6) * 54, y: 52 + Math.floor(index / 6) * 48 };
-  if (stage === 2) return { x: 40 + index * 14, y: 183 - index * 6 + (index % 3) * 14 };
-  return { x: 150 + (index % 6) * 19, y: 80 + Math.floor(index / 6) * 19 };
-}
+import { useId, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { Check, CircleAlert, RotateCcw } from "lucide-react";
+import { AudienceToggle, type AudienceView } from "./audience-toggle";
+import { applyCorrections, demoCorrections, DEMO_THRESHOLD, readiness } from "@/lib/demo/readiness";
 
 export function DataTransformation() {
-  const [stage, setStage] = useState(0);
-  const [manual, setManual] = useState(false);
-  const container = useRef<HTMLDivElement>(null);
-  const inView = useInView(container, { amount: 0.6 });
+  const id = useId();
   const reduce = useReducedMotion();
-  // One short introduction; never loops or runs offscreen. Any interaction stops it.
-  useEffect(() => {
-    if (manual || reduce !== false || !inView || stage === 3) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const sync = () => {
-      clearTimeout(timer);
-      if (!document.hidden) timer = setTimeout(() => setStage((current) => Math.min(3, current + 1)), 1100);
-    };
-    sync();
-    document.addEventListener("visibilitychange", sync);
-    return () => { clearTimeout(timer); document.removeEventListener("visibilitychange", sync); };
-  }, [inView, manual, reduce, stage]);
-  function selectStage(next: number) { setManual(true); setStage(next); }
+  const [view, setView] = useState<AudienceView>("business");
+  const [resolved, setResolved] = useState<readonly string[]>([]);
+  const [structured, setStructured] = useState(true);
+  const result = readiness(applyCorrections(resolved));
+  const percentage = result.percent.toFixed(1);
+
+  function toggleCorrection(recordId: string) {
+    setResolved((current) => current.includes(recordId)
+      ? current.filter((value) => value !== recordId)
+      : [...current, recordId]);
+  }
+
   return (
-    <div ref={container} onFocus={() => setManual(true)} className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60">
-      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-        <span className="eyebrow">From complexity to clarity</span>
-        <span className="font-mono text-xs text-emerald-700 dark:text-emerald-300">0{stage + 1} / 04</span>
+    <section aria-labelledby={`${id}-title`} className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
+      <div className="border-b border-slate-200 p-5 dark:border-slate-700">
+        <p className="eyebrow">Interactive lab / Synthetic data</p>
+        <h2 id={`${id}-title`} className="mt-2 text-xl font-semibold tracking-tight">Is this data ready for review?</h2>
+        <p className="mt-2 text-xs leading-6 text-slate-600 dark:text-slate-400">One question. Two ways to explain the answer.</p>
+        <div className="mt-3"><AudienceToggle value={view} onChange={setView} controls={`${id}-view`} /></div>
       </div>
-      <svg aria-hidden="true" viewBox="0 0 400 225" className="w-full text-emerald-700 dark:text-emerald-300">
-        {[40, 88, 136, 184].map((y) => <path key={y} d={`M24 ${y}H376`} className="stroke-slate-200 dark:stroke-slate-800" strokeDasharray="2 6" />)}
-        <motion.path initial={false} animate={{ opacity: stage === 2 ? 0.65 : 0 }} d="M35 195L355 64" stroke="currentColor" strokeWidth="1.5" />
-        {Array.from({ length: 24 }, (_, i) => {
-          const position = point(i, stage);
-          return <motion.circle key={i} initial={false} animate={{ cx: position.x, cy: position.y, r: stage === 3 ? 6 : 4, opacity: stage === 2 && i % 3 === 0 ? 0.35 : 0.85 }} transition={{ duration: reduce ? 0 : 0.45, delay: reduce ? 0 : i * 0.004 }} fill="currentColor" />;
-        })}
-        <motion.rect initial={false} animate={{ opacity: stage === 3 ? 1 : 0 }} x="133" y="61" width="132" height="97" rx="12" fill="none" stroke="currentColor" strokeWidth="1" />
-      </svg>
-      <div className="px-5 pb-5">
-        <p className="text-xl font-semibold" aria-live={manual ? "polite" : "off"}>{stages[stage].title}</p>
-        <p className="mt-1 min-h-10 text-sm text-slate-600 dark:text-slate-400">{stages[stage].detail}</p>
-        <div className="mt-3 grid grid-cols-4 gap-1" aria-label="Explore the transformation">
-          {stages.map((item, i) => <button key={item.title} type="button" aria-pressed={stage === i} onClick={() => selectStage(i)} className={`min-h-11 border-t-2 px-1 text-xs transition-colors ${stage === i ? "border-emerald-600 font-semibold text-emerald-800 dark:border-emerald-300 dark:text-emerald-300" : "border-slate-200 text-slate-600 hover:border-emerald-500 dark:border-slate-700 dark:text-slate-400"}`}>{item.title}</button>)}
+
+      <div className="p-5">
+        <div className="flex items-end justify-between gap-4">
+          <div><p className="eyebrow">Records passing checks</p><p className="mt-1 font-mono text-4xl font-semibold tracking-tight">{percentage}<span className="text-xl text-slate-500">%</span></p></div>
+          <span className="mb-1 font-mono text-xs text-slate-600 dark:text-slate-400">{result.passed} / {result.total} records</span>
         </div>
-        <button type="button" onClick={() => selectStage((stage + 1) % stages.length)} className="mt-3 flex min-h-11 w-full items-center justify-between rounded-lg bg-slate-100 px-4 text-sm font-medium transition-colors hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-slate-700">{stages[stage].label}<ArrowRight className="size-4" aria-hidden="true" /></button>
-        <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-400">Interactive process illustration · not client data</p>
+        <div className="relative mt-4 h-3 rounded-full bg-slate-100 dark:bg-slate-800" role="meter" aria-label="Records passing demo validation" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(percentage)} aria-valuetext={`${result.passed} of ${result.total} records pass; ${percentage} percent`}>
+          <motion.div initial={false} animate={{ scaleX: result.percent / 100 }} transition={{ duration: reduce ? 0 : 0.3 }} className="absolute inset-0 origin-left rounded-full bg-emerald-600 dark:bg-emerald-300" />
+          <span aria-hidden="true" className="absolute -top-1 h-5 w-0.5 bg-slate-900 dark:bg-white" style={{ left: `${DEMO_THRESHOLD}%` }} />
+        </div>
+        <div className="mt-2 flex justify-between font-mono text-[10px] text-slate-500 dark:text-slate-400"><span>0%</span><span>Review threshold ≥ {DEMO_THRESHOLD}%</span><span>100%</span></div>
+        <p role="status" aria-atomic="true" className="mt-3 min-h-10 text-sm font-medium text-emerald-800 dark:text-emerald-200">
+          {result.passed} of {result.total} pass. {result.eligible ? "Review threshold met. Human approval still required." : "Below review threshold. Resolve the flagged records."}
+        </p>
+
+        <div id={`${id}-view`} className="mt-4 min-h-64 border-t border-slate-200 pt-4 dark:border-slate-700">
+          {view === "business" ? (
+            <motion.div key="business" initial={false} animate={{ opacity: [0.65, 1] }} transition={{ duration: reduce ? 0 : 0.18 }}>
+              <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">Each tile is the same event record throughout the demo. A check means its identifier, station, and units pass the defined rules.</p>
+              <ul aria-label="Validation results for all twelve synthetic records" className="mt-4 grid grid-cols-4 gap-2">
+                {result.checked.map((record) => <li key={record.id} className={`rounded-md border p-2 ${record.valid ? "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40" : "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"}`}>
+                  <span className="block font-mono text-[10px]">{record.id}</span>
+                  <span className="mt-2 flex items-center gap-1 text-[10px]">{record.valid ? <Check aria-hidden="true" className="size-3" /> : <CircleAlert aria-hidden="true" className="size-3" />}{record.valid ? "Pass" : "Check"}</span>
+                  <span className="sr-only">{record.issues.join(", ")}</span>
+                </li>)}
+              </ul>
+            </motion.div>
+          ) : (
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-2"><p className="eyebrow">Same records / inspect structure</p><button type="button" aria-pressed={structured} onClick={() => setStructured(!structured)} className="min-h-11 rounded-md px-2 text-xs font-semibold text-emerald-800 dark:text-emerald-200">{structured ? "Show raw records" : "Structure records"}</button></div>
+              <ul aria-label={structured ? "Structured event records" : "Raw event records"} className={`mt-2 max-h-52 overflow-y-auto overscroll-contain rounded-lg border border-slate-200 p-2 dark:border-slate-700 ${structured ? "space-y-1" : "grid grid-cols-2 gap-2"}`} tabIndex={0}>
+                {result.checked.map((record) => <motion.li layout={reduce ? false : "position"} key={record.id} transition={{ duration: reduce ? 0 : 0.25 }} className="min-w-0 rounded bg-slate-50 p-2 font-mono text-[10px] leading-5 dark:bg-slate-950">
+                  {structured ? <span className="flex flex-wrap justify-between gap-x-2"><span>{record.id} / {record.station}</span><span>{record.units ?? "NULL"} units · {record.valid ? "PASS" : "MISSING"}</span></span> : <code className="break-all">{JSON.stringify({ id: record.id, station: record.station, units: record.units })}</code>}
+                </motion.li>)}
+              </ul>
+              <details className="mt-3 text-xs"><summary className="cursor-pointer py-2 font-medium">Inspect the calculation</summary><pre className="mt-2 overflow-x-auto rounded-lg bg-slate-950 p-3 text-xs leading-6 text-emerald-200"><code>{`valid = unique(id) && nonEmpty(station)\n        && safeInteger(units) && units >= 0\nreadiness = ${result.passed} / ${result.total} * 100\nreview = readiness >= ${DEMO_THRESHOLD}`}</code></pre><p className="mt-2 leading-5 text-slate-500 dark:text-slate-400">Pseudocode for the TypeScript checks running in this demo.</p></details>
+            </div>
+          )}
+        </div>
+
+        <fieldset className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700">
+          <legend className="px-1 text-xs font-semibold">Try a documented synthetic correction</legend>
+          <div className="mt-2 flex flex-wrap gap-2">{Object.entries(demoCorrections).map(([recordId, units]) => <button key={recordId} type="button" aria-label={`Apply synthetic correction for ${recordId}: units ${units}`} aria-pressed={resolved.includes(recordId)} onClick={() => toggleCorrection(recordId)} className={`filter-button ${resolved.includes(recordId) ? "filter-active" : "filter-idle"}`}>{recordId} → {units}{resolved.includes(recordId) && <Check aria-hidden="true" className="size-3" />}</button>)}</div>
+          <button type="button" onClick={() => setResolved([])} disabled={resolved.length === 0} className="mt-2 inline-flex min-h-11 items-center gap-2 text-xs text-slate-600 disabled:cursor-default disabled:opacity-50 dark:text-slate-400"><RotateCcw aria-hidden="true" className="size-3" />Reset corrections</button>
+        </fieldset>
+        <p className="mt-2 text-[11px] leading-5 text-slate-500 dark:text-slate-400">Independent demonstration, not a client outcome. All 12 records and correction values are fictional. Passing these checks does not certify production readiness.</p>
       </div>
-    </div>
+    </section>
   );
 }

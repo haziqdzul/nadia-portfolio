@@ -46,7 +46,7 @@ export default function HomePage() {
             <p>
               While I love diving deep into complex code and
               data architecture, my ultimate goal is simple:
-              <b> making data speak</b> so businesses can move forward with absolute confidence.
+              <b> making data speak</b> so teams can move forward with clearer evidence and understood limitations.
             </p>
           </div>
         </div>

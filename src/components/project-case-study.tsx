@@ -6,6 +6,10 @@ import { ArrowRight, X } from "lucide-react";
 import type { ReportProject } from "@/lib/projects";
 import { projectStories } from "@/lib/project-stories";
 import { ProjectVisual } from "@/components/project-visual";
+import { SchemaEvidence } from "./schema-evidence";
+import { RequirementsEvidence } from "./requirements-evidence";
+import { ProjectMemoryGallery } from "./project-memory-gallery";
+import { projectMedia } from "@/lib/project-media";
 
 export function ProjectCaseStudy({ project, onClose }: Readonly<{ project: ReportProject; onClose: () => void }>) {
   const heading = useRef<HTMLHeadingElement>(null);
@@ -35,8 +39,12 @@ export function ProjectCaseStudy({ project, onClose }: Readonly<{ project: Repor
         <p className="eyebrow">{project.client}</p>
         <h3 ref={heading} tabIndex={-1} id={`case-${project.id}`} className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{project.title}</h3>
         <p className="mt-4 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">{project.description}</p>
+        {project.id === "oracle" && <SchemaEvidence />}
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-[0.8fr_1fr]">
           <div className="lg:sticky lg:top-28">
+            {project.id === "statsdw" ? <RequirementsEvidence /> : project.id === "oracle" ? (
+              <div className="rounded-lg border border-slate-200 p-5 dark:border-slate-700"><p className="eyebrow">Published project scope</p><p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">Schema adaptation and source-issue documentation across Kuala Lumpur, Labuan, and Putrajaya. The independent lab above demonstrates design reasoning; it does not reproduce these client schemas.</p></div>
+            ) : <>
             <p className="eyebrow">Explore the transformation</p>
             <div className="my-4 flex gap-2" aria-label="Transformation view">
               {([false, true] as const).map((value) => <button key={String(value)} type="button" aria-pressed={transformed === value} onClick={() => setTransformed(value)} className={`filter-button ${transformed === value ? "filter-active" : "filter-idle"}`}>{value ? "After · Structured" : "Before · Inputs"}</button>)}
@@ -47,6 +55,7 @@ export function ProjectCaseStudy({ project, onClose }: Readonly<{ project: Repor
             </div>
             <p className="my-4 text-xs leading-5 text-slate-500 dark:text-slate-400">Process reconstruction from the project summary. These are illustrative structures, not original client artifacts.</p>
             <ProjectVisual kind={project.visual} />
+            </>}
           </div>
           <div>
             <nav aria-label="Case study chapters" className="mb-6 flex flex-wrap gap-2">
@@ -59,6 +68,7 @@ export function ProjectCaseStudy({ project, onClose }: Readonly<{ project: Repor
             <button type="button" onClick={onClose} className="inline-flex min-h-11 items-center gap-3 text-sm font-semibold text-emerald-800 dark:text-emerald-300">Explore another project <ArrowRight className="size-4" aria-hidden="true" /></button>
           </div>
         </div>
+        <ProjectMemoryGallery items={projectMedia.filter((item) => item.projectId === project.id)} />
       </div>
     </motion.article>
   );

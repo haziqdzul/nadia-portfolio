@@ -39,7 +39,7 @@ export function CareerTimeline() {
       <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Experience</p>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2 id={`${id}-heading`} className="section-heading">Career timeline</h2>
-        <p className="max-w-sm text-sm leading-6 text-slate-600 dark:text-slate-300">Hover, focus, or select a diamond below to explore a delivery milestone.</p>
+        <p className="max-w-sm text-sm leading-6 text-slate-600 dark:text-slate-300">Select a milestone to see its role in the delivery sequence.</p>
       </div>
 
       <div className="mt-8 rounded-xl border border-slate-200 bg-white/75 p-5 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900/70">
@@ -49,7 +49,7 @@ export function CareerTimeline() {
         </div>
 
         <ol className="divide-y divide-slate-200 dark:divide-slate-700">
-          {roles.map((role) => (
+          {roles.filter((role) => role.start !== null).map((role) => (
             <li key={role.id} className="grid gap-4 py-6 md:grid-cols-[15rem_1fr] md:items-center md:gap-6">
               <div>
                 <h3 className="font-semibold">{role.title}</h3>
@@ -70,6 +70,7 @@ export function CareerTimeline() {
             </li>
           ))}
         </ol>
+        <div className="mt-5 border-t border-slate-200 pt-5 dark:border-slate-700"><p className="eyebrow">Additional experience</p><h3 className="mt-2 font-semibold">Intern, ESG &amp; climate risk</h3><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">MCIS Insurance Berhad</p></div>
 
         <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-600 dark:text-slate-400" aria-label="Timeline legend">
           <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-emerald-600 dark:bg-emerald-300" />Current role</span>

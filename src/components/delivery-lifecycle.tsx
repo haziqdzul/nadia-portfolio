@@ -78,8 +78,8 @@ export function DeliveryLifecycle() {
   const reducedMotion = useReducedMotion();
   const hydrated = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [playback, setPlayback] = useState<boolean | null>(null);
-  // Server and first client render both say Paused. Enable autoplay after hydration.
+  const [playback, setPlayback] = useState<boolean | null>(false);
+  // Manual by default; playback starts only when the visitor chooses Play.
   const isPlaying = hydrated && (playback ?? reducedMotion === false);
   const stage = lifecycleStages[activeIndex];
 
@@ -126,7 +126,7 @@ export function DeliveryLifecycle() {
       <div className="mx-auto max-w-6xl px-6">
         <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">03 / How I work</p>
         <div className="mb-9 flex flex-wrap items-end justify-between gap-6">
-          <h2 id={`${id}-heading`} className="section-heading">One analyst, the full delivery lifecycle</h2>
+          <h2 id={`${id}-heading`} className="section-heading">My contribution across the delivery lifecycle</h2>
           <div className="flex shrink-0 items-center gap-3">
             <span className="flex items-center gap-2 text-xs text-slate-600 dark:text-zinc-400"><span aria-hidden="true" className={`size-1.5 rounded-full ${isPlaying ? "bg-emerald-600 dark:bg-emerald-300" : "bg-zinc-500"}`} />{isPlaying ? "Auto-playing" : "Paused"}</span>
             <button type="button" onClick={() => setPlayback(!isPlaying)} aria-controls={`${id}-panel`} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white dark:border-white/15 dark:bg-white/5 px-4 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 motion-reduce:transition-none">

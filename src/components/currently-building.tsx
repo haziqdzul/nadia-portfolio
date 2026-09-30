@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { Pause, Play } from "lucide-react";
+
 const topics = [
   "Python & APIs",
   "Cloud data tooling",
@@ -9,6 +14,7 @@ type CurrentlyBuildingProps = Readonly<{
 }>;
 
 export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
+  const [paused, setPaused] = useState(false);
   return (
     <aside
       aria-label="Currently building"
@@ -18,7 +24,7 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
         Currently building
       </p>
       <ul className="flex min-w-0 flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-x-6">
-        {topics.map((topic) => (
+        {topics.map((topic, topicIndex) => (
           <li
             key={topic}
             className="flex min-w-0 items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-200"
@@ -27,7 +33,11 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
               {Array.from({ length: 7 }, (_, index) => (
                 <span
                   key={index}
-                  className="h-1.5 w-1 rounded-[1px] bg-emerald-500 dark:bg-emerald-300"
+                  className="building-progress-segment h-1.5 w-1 rounded-[1px] bg-emerald-500 dark:bg-emerald-300"
+                  style={{
+                    animationDelay: `${index * 0.14 - topicIndex * 0.35 - 1.8}s`,
+                    animationPlayState: paused ? "paused" : "running",
+                  }}
                 />
               ))}
             </span>
@@ -35,6 +45,14 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
           </li>
         ))}
       </ul>
+      <button
+        type="button"
+        onClick={() => setPaused((value) => !value)}
+        aria-label={paused ? "Play progress animation" : "Pause progress animation"}
+        className="flex size-11 shrink-0 items-center justify-center self-end rounded-full text-emerald-800 transition-colors hover:bg-emerald-50 sm:ml-auto sm:self-auto dark:text-emerald-300 dark:hover:bg-emerald-950 motion-reduce:hidden"
+      >
+        {paused ? <Play aria-hidden="true" className="size-4" /> : <Pause aria-hidden="true" className="size-4" />}
+      </button>
     </aside>
   );
 }

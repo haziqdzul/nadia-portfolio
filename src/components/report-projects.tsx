@@ -1,11 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useId, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowDown, ArrowUpRight, LayoutGrid, List, X } from "lucide-react";
 import { categories, reportProjects, skillGroups, type Category, type Skill } from "@/lib/projects";
-import { ProjectVisual } from "@/components/project-visual";
+import { canDisplayMedia, projectMedia } from "@/lib/project-media";
+
+function ProjectCover({ projectId }: Readonly<{ projectId: string }>) {
+  const photo = projectMedia.find((item) => item.projectId === projectId && canDisplayMedia(item));
+  if (!photo) return null;
+  return <div className="relative aspect-[8/5] overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-950"><Image src={photo.src} alt="" fill sizes="(min-width: 768px) 520px, 90vw" className="object-cover saturate-[0.85] transition duration-300 group-hover:scale-[1.025] group-hover:saturate-100 motion-reduce:transform-none motion-reduce:transition-none" /><span className="absolute bottom-3 left-3 rounded-full bg-slate-950/85 px-3 py-1.5 text-xs font-medium text-white">{photo.kind === "sample photo" ? "Sample photo · illustrative" : photo.title}</span></div>;
+}
 
 export { reportProjects, type ReportProject } from "@/lib/projects";
 const ProjectCaseStudy = dynamic(() => import("@/components/project-case-study").then((module) => module.ProjectCaseStudy), {
@@ -21,6 +28,7 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
   const [view, setView] = useState<"workspace" | "list">("workspace");
   const [selected, setSelected] = useState<string | null>(null);
   const projectButtons = useRef(new Map<string, HTMLButtonElement>());
+  const returnFocus = useRef<HTMLButtonElement | null>(null);
   const portfolioHeading = useRef<HTMLHeadingElement>(null);
   const visible = reportProjects.filter((project) => (category === "All" || project.categories.includes(category)) && (skill === null || project.skills.includes(skill)));
   const selectedProject = reportProjects.find((project) => project.id === selected);
@@ -29,7 +37,8 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
   function closeCase() {
     const previous = selected;
     setSelected(null);
-    if (previous) projectButtons.current.get(previous)?.focus();
+    if (returnFocus.current?.isConnected) returnFocus.current.focus();
+    else if (previous) projectButtons.current.get(previous)?.focus();
   }
   function resetFilters() { setCategory("All"); setSkill(null); setSelected(null); }
   function filterBySkill() {
@@ -44,6 +53,14 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
         <div><p className="eyebrow">01 / Project sandbox</p><h2 ref={portfolioHeading} tabIndex={-1} id={`${id}-heading`} className="section-heading mt-4">Every project.<br />A different way to find clarity.</h2></div>
         <p className="max-w-sm text-sm leading-7 text-slate-600 dark:text-slate-400">Filter like a report. Open a project to follow the thinking, explore its transformation, and examine the evidence.</p>
       </div>
+      <div role="group" aria-label="Featured case studies" className="mt-8 grid gap-3 sm:grid-cols-2">
+        {([ ["statsdw", "Delivery evidence", "Requirements through acceptance"], ["oracle", "Technical evidence", "Schema decisions and data lineage"] ] as const).map(([projectId, label, title]) => (
+          <button key={projectId} type="button" aria-expanded={selected === projectId} aria-controls={selected === projectId ? `${id}-case` : undefined} onClick={(event) => { returnFocus.current = event.currentTarget; setSelected(projectId); }} className="group flex min-h-28 items-center justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-5 text-left transition-colors hover:border-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/20 dark:hover:border-emerald-300">
+            <span><span className="eyebrow block">Featured / {label}</span><span className="mt-2 block text-lg font-semibold">{title}</span></span><ArrowUpRight className="size-5 shrink-0 text-emerald-800 dark:text-emerald-300" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+      {selectedProject && <div id={`${id}-case`}><ProjectCaseStudy key={selectedProject.id} project={selectedProject} onClose={closeCase} /></div>}
       <div className="mt-10 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-800 dark:bg-slate-900/40">
         <fieldset><legend className="eyebrow mb-4">Slice by type of work</legend><div className="flex flex-wrap gap-2">
           {categories.map((item) => <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => { setCategory(item); setSelected(null); }} className={`filter-button ${category === item ? "filter-active" : "filter-idle"}`}>{item}<span className="font-mono text-xs opacity-75">{reportProjects.filter((p) => (item === "All" || p.categories.includes(item)) && (!skill || p.skills.includes(skill))).length}</span></button>)}
@@ -54,7 +71,7 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
             {skill && <button type="button" onClick={() => { setSkill(null); setSelected(null); }} className="filter-button filter-idle" aria-label={`Clear ${skill} skill filter`}>{skill}<X className="size-3" aria-hidden="true" /></button>}
             {(skill || category !== "All") && <button type="button" onClick={resetFilters} className="min-h-11 px-3 text-xs underline underline-offset-4">Reset filters</button>}
             <div className="flex gap-1" aria-label="Project display">
-              <button type="button" aria-pressed={view === "workspace"} onClick={() => setView("workspace")} className={`filter-button ${view === "workspace" ? "filter-active" : "filter-idle"}`}><LayoutGrid aria-hidden="true" className="size-4" /><span className="hidden sm:inline">Workspace</span><span className="sr-only sm:hidden">Workspace</span></button>
+              <button type="button" aria-pressed={view === "workspace"} onClick={() => setView("workspace")} className={`filter-button ${view === "workspace" ? "filter-active" : "filter-idle"}`}><LayoutGrid aria-hidden="true" className="size-4" /><span className="hidden sm:inline">Visual overview</span><span className="sr-only sm:hidden">Visual overview</span></button>
               <button type="button" aria-pressed={view === "list"} onClick={() => setView("list")} className={`filter-button ${view === "list" ? "filter-active" : "filter-idle"}`}><List aria-hidden="true" className="size-4" />List</button>
             </div>
           </div>
@@ -64,14 +81,14 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
         <ul className={`grid gap-4 ${view === "workspace" ? "md:grid-cols-2" : "grid-cols-1"}`}>
           <AnimatePresence initial={false}>
             {visible.map((project, index) => <motion.li key={project.id} layout={reduce ? false : "position"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }} className={view === "workspace" && project.id === "statsdw" ? "md:col-span-2" : ""}>
-              <button ref={(node) => { if (node) projectButtons.current.set(project.id, node); else projectButtons.current.delete(project.id); }} type="button" aria-expanded={selected === project.id} aria-controls={selected === project.id ? `${id}-case` : undefined} onClick={() => selected === project.id ? closeCase() : setSelected(project.id)} className={`group h-full w-full rounded-xl border p-6 text-left transition-[border-color,box-shadow] duration-200 hover:border-emerald-600 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:border-emerald-400 ${selected === project.id ? "border-emerald-600 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-950/30" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40"}`}>
+              <button ref={(node) => { if (node) projectButtons.current.set(project.id, node); else projectButtons.current.delete(project.id); }} type="button" aria-expanded={selected === project.id} aria-controls={selected === project.id ? `${id}-case` : undefined} onClick={(event) => { returnFocus.current = event.currentTarget; if (selected === project.id) closeCase(); else setSelected(project.id); }} className={`group h-full w-full rounded-xl border p-6 text-left transition-[border-color,box-shadow] duration-200 hover:border-emerald-600 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:border-emerald-400 ${selected === project.id ? "border-emerald-600 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-950/30" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40"}`}>
                 <div className={`grid items-center gap-6 ${view === "workspace" && project.id === "statsdw" ? "lg:grid-cols-2" : ""}`}>
                   <div><div className="flex items-start justify-between gap-3"><p className="eyebrow leading-5">{project.client}</p><span className="font-mono text-xs text-slate-500 dark:text-slate-400">0{index + 1}</span></div>
                   <h3 className={`mt-4 font-semibold leading-snug tracking-tight ${view === "workspace" ? "text-2xl" : "text-xl"}`}>{project.title}</h3>
                   <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-400">{project.description}</p>
                   <p className="mt-4 text-xs font-medium text-emerald-800 dark:text-emerald-300">{project.highlights.join(" / ")}</p>
                   <span className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-700"><span className="text-xs text-slate-600 dark:text-slate-400">{project.skills.slice(0, 3).join(" · ")}</span><span className="flex shrink-0 items-center gap-1 text-xs font-semibold">{selected === project.id ? "Close" : "Explore"}<ArrowUpRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" /></span></span></div>
-                  {view === "workspace" && <div aria-hidden="true" className="pointer-events-none"><ProjectVisual kind={project.visual} /></div>}
+                  {view === "workspace" && <ProjectCover projectId={project.id} />}
                 </div>
               </button>
             </motion.li>)}
@@ -79,7 +96,6 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
         </ul>
         {visible.length === 0 && <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center dark:border-slate-700"><h3 className="text-xl font-semibold">No projects match both filters.</h3><button type="button" onClick={resetFilters} className="action-button mt-5">Show all projects</button></div>}
       </div>
-      {selectedProject && <div id={`${id}-case`}><ProjectCaseStudy key={selectedProject.id} project={selectedProject} onClose={closeCase} /></div>}
     </section>
 
     <section id="skills" aria-labelledby={`${id}-skills`} className="border-y border-slate-200 bg-slate-100/60 py-20 sm:py-24 dark:border-slate-800 dark:bg-slate-900/30">
@@ -89,6 +105,7 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
         <div className="mt-9 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           <div className="grid gap-5 sm:grid-cols-2">{skillGroups.map((group, index) => <div key={group.title} className="border-t border-slate-300 pt-5 dark:border-slate-700"><h3 className="mb-3 flex items-center gap-3 text-sm font-semibold"><span className="font-mono text-xs text-emerald-700 dark:text-emerald-300">0{index + 1}</span>{group.title}</h3><ul className="flex flex-wrap gap-2">{group.skills.map((item) => {
             const count = reportProjects.filter((p) => p.skills.includes(item)).length;
+            if (count === 0) return null;
             return <li key={item}><button type="button" aria-pressed={evidenceSkill === item} aria-controls={`${id}-evidence`} onClick={() => setEvidenceSkill(item)} className={`filter-button ${evidenceSkill === item ? "filter-active" : "filter-idle"}`}>{item}<span className="font-mono text-xs opacity-75">{count}</span></button></li>;
           })}</ul></div>)}</div>
           <div id={`${id}-evidence`} className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-950">
@@ -98,6 +115,7 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
             {evidence.length ? <button type="button" onClick={filterBySkill} className="action-button mt-6">Filter projects by {evidenceSkill}<ArrowDown aria-hidden="true" className="size-4 rotate-180" /></button> : <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-400">This tool is listed in my toolkit; a case study demonstrating it has not been added.</p>}
           </div>
         </div>
+        <p className="mt-6 text-sm text-slate-600 dark:text-slate-400">Additional toolkit: Power BI · a supporting case study has not been published yet.</p>
         {skillsFooter}
       </div>
     </section>
