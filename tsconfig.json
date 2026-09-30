@@ -38,7 +38,11 @@
     ".next-production/types/**/*.ts",
     ".next-production/dev/types/**/*.ts",
     ".next-review/types/**/*.ts",
-    ".next-review/dev/types/**/*.ts"
+    ".next-review/dev/types/**/*.ts",
+    ".next-evidence/types/**/*.ts",
+    ".next-evidence/dev/types/**/*.ts",
+    ".next-media/types/**/*.ts",
+    ".next-media/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
