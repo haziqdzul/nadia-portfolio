@@ -72,10 +72,11 @@ export function DataTransformation() {
         <fieldset className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700">
           <legend className="px-1 text-xs font-semibold">Try a documented synthetic correction</legend>
           <div className="mt-2 flex flex-wrap gap-2">{Object.entries(demoCorrections).map(([recordId, units]) => <button key={recordId} type="button" aria-label={`Apply synthetic correction for ${recordId}: units ${units}`} aria-pressed={resolved.includes(recordId)} onClick={() => toggleCorrection(recordId)} className={`filter-button ${resolved.includes(recordId) ? "filter-active" : "filter-idle"}`}>{recordId} → {units}{resolved.includes(recordId) && <Check aria-hidden="true" className="size-3" />}</button>)}</div>
-          <button type="button" onClick={() => setResolved([])} disabled={resolved.length === 0} className="mt-2 inline-flex min-h-11 items-center gap-2 text-xs text-slate-600 disabled:cursor-default disabled:opacity-50 dark:text-slate-400"><RotateCcw aria-hidden="true" className="size-3" />Reset corrections</button>
+          <div className="mt-2 flex items-center justify-between gap-2"><button type="button" onClick={() => setResolved([])} disabled={resolved.length === 0} className="inline-flex min-h-11 items-center gap-2 text-xs text-slate-600 disabled:cursor-default disabled:opacity-50 dark:text-slate-400"><RotateCcw aria-hidden="true" className="size-3" />Reset corrections</button></div>
         </fieldset>
         <p className="mt-2 text-[11px] leading-5 text-slate-500 dark:text-slate-400">Independent demonstration, not a client outcome. All 12 records and correction values are fictional. Passing these checks does not certify production readiness.</p>
       </div>
     </section>
   );
 }
+

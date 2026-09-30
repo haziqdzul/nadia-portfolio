@@ -62,6 +62,13 @@
   0%, 65%, 100% { opacity: 0.35; transform: scaleY(0.8); }
   30% { opacity: 1; transform: scaleY(1.4); }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .showcase-fade { animation: showcase-appear 300ms ease-out; }
+}
+@keyframes showcase-appear {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
