@@ -1,18 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
+
 import { useId, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowDown, ArrowUpRight, LayoutGrid, List, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, X } from "lucide-react";
 import { categories, reportProjects, skillGroups, type Category, type Skill } from "@/lib/projects";
-import { canDisplayMedia, projectMedia } from "@/lib/project-media";
-
-function ProjectCover({ projectId }: Readonly<{ projectId: string }>) {
-  const photo = projectMedia.find((item) => item.projectId === projectId && canDisplayMedia(item));
-  if (!photo) return null;
-  return <div className="relative aspect-[8/5] overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-950"><Image src={photo.src} alt="" fill sizes="(min-width: 768px) 520px, 90vw" className="object-cover saturate-[0.85] transition duration-300 group-hover:scale-[1.025] group-hover:saturate-100 motion-reduce:transform-none motion-reduce:transition-none" /><span className="absolute bottom-3 left-3 rounded-full bg-slate-950/85 px-3 py-1.5 text-xs font-medium text-white">{photo.kind === "sample photo" ? "Sample photo · illustrative" : photo.title}</span></div>;
-}
+import { projectSummaries } from "@/lib/project-summaries";
 
 export { reportProjects, type ReportProject } from "@/lib/projects";
 const ProjectCaseStudy = dynamic(() => import("@/components/project-case-study").then((module) => module.ProjectCaseStudy), {
@@ -25,7 +19,6 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
   const [category, setCategory] = useState<Category>("All");
   const [skill, setSkill] = useState<Skill | null>(null);
   const [evidenceSkill, setEvidenceSkill] = useState<Skill>("SQL");
-  const [view, setView] = useState<"workspace" | "list">("workspace");
   const [selected, setSelected] = useState<string | null>(null);
   const projectButtons = useRef(new Map<string, HTMLButtonElement>());
   const returnFocus = useRef<HTMLButtonElement | null>(null);
@@ -49,55 +42,48 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
 
   return <>
     <section id="portfolio" aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <div><p className="eyebrow">01 / Project sandbox</p><h2 ref={portfolioHeading} tabIndex={-1} id={`${id}-heading`} className="section-heading mt-4">Every project.<br />A different way to find clarity.</h2></div>
-        <p className="max-w-sm text-sm leading-7 text-slate-600 dark:text-slate-400">Filter like a report. Open a project to follow the thinking, explore its transformation, and examine the evidence.</p>
-      </div>
-      <div role="group" aria-label="Featured case studies" className="mt-8 grid gap-3 sm:grid-cols-2">
-        {([ ["statsdw", "Delivery evidence", "Requirements through acceptance"], ["oracle", "Technical evidence", "Schema decisions and data lineage"] ] as const).map(([projectId, label, title]) => (
-          <button key={projectId} type="button" aria-expanded={selected === projectId} aria-controls={selected === projectId ? `${id}-case` : undefined} onClick={(event) => { returnFocus.current = event.currentTarget; setSelected(projectId); }} className="group flex min-h-28 items-center justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-5 text-left transition-colors hover:border-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/20 dark:hover:border-emerald-300">
-            <span><span className="eyebrow block">Featured / {label}</span><span className="mt-2 block text-lg font-semibold">{title}</span></span><ArrowUpRight className="size-5 shrink-0 text-emerald-800 dark:text-emerald-300" aria-hidden="true" />
-          </button>
-        ))}
+      <p className="eyebrow">01 / Selected projects</p>
+      <h2 ref={portfolioHeading} tabIndex={-1} id={`${id}-heading`} className="section-heading mt-4">The work. The role. The result.</h2>
+      <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">Five projects connecting business questions to usable data. Start with the overview, then open a case study to see my contribution and supporting evidence.</p>
+      <fieldset className="mt-8"><legend className="mb-3 text-xs font-medium text-slate-500 dark:text-slate-400">Browse by type of work</legend><div className="flex flex-wrap gap-2">{categories.map((item) => <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => { setCategory(item); setSelected(null); }} className={`filter-button ${category === item ? "filter-active" : "filter-idle"}`}>{item === "All" ? "All projects" : item === "Requirements" ? "Business requirements" : item === "Data engineering" ? "Data preparation" : item === "Training & UAT" ? "Training & testing" : item}</button>)}</div></fieldset>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <p role="status" className="text-xs text-slate-500 dark:text-slate-400">{visible.length} {visible.length === 1 ? "project" : "projects"}{skill ? ` using ${skill}` : ""}</p>
+        {skill && <button type="button" onClick={() => { setSkill(null); setSelected(null); }} className="filter-button filter-idle" aria-label={`Clear ${skill} skill filter`}>{skill}<X className="size-3" aria-hidden="true" /></button>}
+        {(skill || category !== "All") && <button type="button" onClick={resetFilters} className="min-h-11 text-xs underline underline-offset-4">Show all projects</button>}
       </div>
       {selectedProject && <div id={`${id}-case`}><ProjectCaseStudy key={selectedProject.id} project={selectedProject} onClose={closeCase} /></div>}
-      <div className="mt-10 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-800 dark:bg-slate-900/40">
-        <fieldset><legend className="eyebrow mb-4">Slice by type of work</legend><div className="flex flex-wrap gap-2">
-          {categories.map((item) => <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => { setCategory(item); setSelected(null); }} className={`filter-button ${category === item ? "filter-active" : "filter-idle"}`}>{item}<span className="font-mono text-xs opacity-75">{reportProjects.filter((p) => (item === "All" || p.categories.includes(item)) && (!skill || p.skills.includes(skill))).length}</span></button>)}
-        </div></fieldset>
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
-          <p role="status" aria-atomic="true" className="font-mono text-xs text-slate-600 dark:text-slate-400">{String(visible.length).padStart(2, "0")} / 05 projects{skill ? ` · ${skill}` : ""}</p>
-          <div className="flex flex-wrap items-center gap-2">
-            {skill && <button type="button" onClick={() => { setSkill(null); setSelected(null); }} className="filter-button filter-idle" aria-label={`Clear ${skill} skill filter`}>{skill}<X className="size-3" aria-hidden="true" /></button>}
-            {(skill || category !== "All") && <button type="button" onClick={resetFilters} className="min-h-11 px-3 text-xs underline underline-offset-4">Reset filters</button>}
-            <div className="flex gap-1" aria-label="Project display">
-              <button type="button" aria-pressed={view === "workspace"} onClick={() => setView("workspace")} className={`filter-button ${view === "workspace" ? "filter-active" : "filter-idle"}`}><LayoutGrid aria-hidden="true" className="size-4" /><span className="hidden sm:inline">Visual overview</span><span className="sr-only sm:hidden">Visual overview</span></button>
-              <button type="button" aria-pressed={view === "list"} onClick={() => setView("list")} className={`filter-button ${view === "list" ? "filter-active" : "filter-idle"}`}><List aria-hidden="true" className="size-4" />List</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id={`${id}-results`} className="mt-5">
-        <ul className={`grid gap-4 ${view === "workspace" ? "md:grid-cols-2" : "grid-cols-1"}`}>
+      <div id={`${id}-results`} className="mt-6">
+        <ul className="grid gap-6 md:grid-cols-2">
           <AnimatePresence initial={false}>
-            {visible.map((project, index) => <motion.li key={project.id} layout={reduce ? false : "position"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }} className={view === "workspace" && project.id === "statsdw" ? "md:col-span-2" : ""}>
-              <button ref={(node) => { if (node) projectButtons.current.set(project.id, node); else projectButtons.current.delete(project.id); }} type="button" aria-expanded={selected === project.id} aria-controls={selected === project.id ? `${id}-case` : undefined} onClick={(event) => { returnFocus.current = event.currentTarget; if (selected === project.id) closeCase(); else setSelected(project.id); }} className={`group h-full w-full rounded-xl border p-6 text-left transition-[border-color,box-shadow] duration-200 hover:border-emerald-600 hover:shadow-lg hover:shadow-emerald-950/5 dark:hover:border-emerald-400 ${selected === project.id ? "border-emerald-600 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-950/30" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40"}`}>
-                <div className={`grid items-center gap-6 ${view === "workspace" && project.id === "statsdw" ? "lg:grid-cols-2" : ""}`}>
-                  <div><div className="flex items-start justify-between gap-3"><p className="eyebrow leading-5">{project.client}</p><span className="font-mono text-xs text-slate-500 dark:text-slate-400">0{index + 1}</span></div>
-                  <h3 className={`mt-4 font-semibold leading-snug tracking-tight ${view === "workspace" ? "text-2xl" : "text-xl"}`}>{project.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-400">{project.description}</p>
-                  <p className="mt-4 text-xs font-medium text-emerald-800 dark:text-emerald-300">{project.highlights.join(" / ")}</p>
-                  <span className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-700"><span className="text-xs text-slate-600 dark:text-slate-400">{project.skills.slice(0, 3).join(" · ")}</span><span className="flex shrink-0 items-center gap-1 text-xs font-semibold">{selected === project.id ? "Close" : "Explore"}<ArrowUpRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" /></span></span></div>
-                  {view === "workspace" && <ProjectCover projectId={project.id} />}
-                </div>
-              </button>
-            </motion.li>)}
+            {visible.map((project) => {
+              const summary = projectSummaries[project.id];
+              const featured = project.id === "statsdw";
+              return <motion.li key={project.id} layout={reduce ? false : "position"} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }} className={featured ? "md:col-span-2" : ""}>
+                <article className={`flex h-full flex-col overflow-hidden rounded-2xl border bg-white dark:bg-slate-900/40 ${selected === project.id ? "border-emerald-500" : "border-slate-200 dark:border-slate-800"}`}>
+                  <div className={`grid h-full ${featured ? "lg:grid-cols-[1.2fr_1fr]" : ""}`}>
+                    <div className="flex flex-col p-6 sm:p-7">
+                      <p className="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">{featured && <span className="mr-2 font-semibold text-emerald-800 dark:text-emerald-300">Featured project /</span>}{project.client}</p>
+                      <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-tight">{summary.title}</h3>
+                      <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{summary.purpose}</p>
+                      <div className="mt-5"><p className="text-xs font-semibold text-slate-900 dark:text-slate-100">My contribution</p><p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{summary.contribution}</p></div>
+                      <ul aria-label="Tools and skills" className="mt-5 flex flex-wrap gap-2">{project.skills.slice(0, 3).map((tool) => <li key={tool} className="rounded-md bg-slate-100 px-2 py-1 text-[11px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">{tool}</li>)}</ul>
+                      <button ref={(node) => { if (node) projectButtons.current.set(project.id, node); else projectButtons.current.delete(project.id); }} type="button" aria-label={`${selected === project.id ? "Close" : "Read"} case study: ${summary.title}`} aria-expanded={selected === project.id} aria-controls={selected === project.id ? `${id}-case` : undefined} onClick={(event) => { returnFocus.current = event.currentTarget; if (selected === project.id) closeCase(); else setSelected(project.id); }} className="mt-6 flex min-h-11 items-center justify-between gap-3 border-t border-slate-200 pt-4 text-left text-sm font-semibold text-emerald-800 hover:underline dark:border-slate-700 dark:text-emerald-300">{selected === project.id ? "Close case study" : "Read case study"}<ArrowUpRight aria-hidden="true" className="size-4" /></button>
+                    </div>
+                    <div className={`flex flex-col justify-center border-slate-200 bg-slate-50 p-6 sm:p-7 dark:border-slate-800 dark:bg-slate-950/60 ${featured ? "border-t lg:border-l lg:border-t-0" : "border-t"}`}>
+                      <p className="eyebrow">{featured ? "Delivery milestone" : "What the work produced"}</p>
+                      <p className="mt-3 text-2xl font-semibold tracking-tight text-emerald-800 dark:text-emerald-300">{summary.proof}</p>
+                      <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">{summary.proofLabel}</p>
+                      <ol aria-label="Work overview" className="mt-6 space-y-3">{summary.steps.map((step, index) => <li key={step} className="flex items-center gap-3 text-xs"><span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 font-mono text-[10px] text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">{index + 1}</span><span>{step}</span></li>)}</ol>
+                    </div>
+                  </div>
+                </article>
+              </motion.li>;
+            })}
           </AnimatePresence>
         </ul>
         {visible.length === 0 && <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center dark:border-slate-700"><h3 className="text-xl font-semibold">No projects match both filters.</h3><button type="button" onClick={resetFilters} className="action-button mt-5">Show all projects</button></div>}
       </div>
     </section>
-
     <section id="skills" aria-labelledby={`${id}-skills`} className="border-y border-slate-200 bg-slate-100/60 py-20 sm:py-24 dark:border-slate-800 dark:bg-slate-900/30">
       <div className="mx-auto max-w-6xl px-6">
         <p className="eyebrow">02 / Capability → evidence</p><h2 id={`${id}-skills`} className="section-heading mt-4">Skills are a starting point.<br />The work is the evidence.</h2>
@@ -121,3 +107,4 @@ export function ReportProjects({ skillsFooter }: Readonly<{ skillsFooter?: React
     </section>
   </>;
 }
+

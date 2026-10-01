@@ -1,15 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 import { InteractiveLab } from "./interactive-lab";
 import { HeroIntro } from "./hero-intro";
 import { PolicyContext } from "./policy-simulator";
+import { PipelineCover } from "./pipeline-cover";
+import { RevenueStory } from "./revenue-story";
 
 export function Hero() {
   const [labIndex, setLabIndex] = useState(0);
+  const [labsOpen, setLabsOpen] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
+  const labArea = useRef<HTMLDivElement>(null);
+  function toggleLabs(open: boolean) {
+    setLabsOpen(open);
+    if (open) setAdvanced(false);
+    requestAnimationFrame(() => labArea.current?.querySelector<HTMLButtonElement>(open ? "[data-back-cover]" : "[data-cover] .action-button")?.focus({ preventScroll: true }));
+  }
   
   return (
     <section aria-labelledby="hero-heading" className="relative border-b border-slate-200 dark:border-slate-800">
@@ -28,7 +38,6 @@ export function Hero() {
               I’m Nadia Irdina, a Business Intelligence Analyst. I translate business questions into structured requirements, dependable data, and decision-ready dashboards.
             </p>
             
-            <PolicyContext index={labIndex} />
             {/* Action Buttons Container */}
             <div className="mt-6 flex flex-wrap items-center gap-4 w-full">
               <Link href="#portfolio" className="action-button">
@@ -94,15 +103,29 @@ export function Hero() {
                 </div>
               </div>
             </div>
+            {labsOpen && advanced && <PolicyContext index={labIndex} />}
           </div>
           
           {/* Right Side Canvas Component */}
-          <InteractiveLab index={labIndex} onSelect={setLabIndex} />
+          <div ref={labArea} className="min-w-0 self-start">
+            <div data-cover hidden={labsOpen}><PipelineCover active={!labsOpen} onOpen={() => toggleLabs(true)} /></div>
+            <div hidden={!labsOpen}>
+              <button data-back-cover type="button" onClick={() => toggleLabs(false)} className="mb-3 min-h-11 text-sm font-semibold text-emerald-800 dark:text-emerald-300">← Back to pipeline</button>
+              <div hidden={advanced}><RevenueStory onAdvanced={() => setAdvanced(true)} /></div>
+              <div hidden={!advanced}>
+                <button type="button" onClick={() => setAdvanced(false)} className="mb-3 min-h-11 text-sm font-semibold text-emerald-800 dark:text-emerald-300">← Back to the sales story</button>
+                <InteractiveLab index={labIndex} onSelect={setLabIndex} />
+              </div>
+            </div>
+          </div>
           
         </div>
       </div>
     </section>
   );
 }
+
+
+
 
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="760" viewBox="0 0 720 760" role="img" aria-labelledby="title desc">
+<title id="title">Commercial reporting star schema</title><desc id="desc">Three dimensions join many to one from fact_order_line. Net revenue and cost are stored at order-line grain; margin is computed from their sums.</desc>
+<rect width="720" height="760" fill="#020617"/>
+<g font-family="sans-serif" fill="#e2e8f0"><text x="36" y="43" font-size="14" fill="#6ee7b7">SYNTHETIC MODEL / EXPLICIT GRAIN</text>
+<g stroke="#34d399" stroke-width="2" fill="none"><path d="M170 200V268H270V310"/><path d="M550 200V268H450V310"/><path d="M360 510V565"/></g>
+<g font-size="13" fill="#6ee7b7"><text x="181" y="225">1</text><text x="280" y="297">many</text><text x="562" y="225">1</text><text x="459" y="297">many</text><text x="374" y="535">many</text><text x="374" y="557">1</text></g>
+<g fill="#0f172a" stroke="#334155"><rect x="35" y="78" width="275" height="122" rx="12"/><rect x="410" y="78" width="275" height="122" rx="12"/><rect x="160" y="310" width="400" height="200" rx="12" stroke="#34d399"/><rect x="210" y="565" width="300" height="115" rx="12"/></g>
+<g font-size="19" font-weight="600"><text x="55" y="110">dim_date</text><text x="430" y="110">dim_region</text><text x="180" y="345" fill="#6ee7b7">fact_order_line</text><text x="230" y="598">dim_product</text></g>
+<g font-family="monospace" font-size="15"><text x="55" y="143">PK date_key</text><text x="55" y="173">date · month · year</text><text x="430" y="143">PK region_key</text><text x="430" y="173">region_name</text><text x="180" y="380">PK order_line_id</text><text x="180" y="410">FK date_key · region_key</text><text x="180" y="440">FK product_key</text><text x="180" y="475">quantity · net_revenue · cost</text><text x="230" y="631">PK product_key</text><text x="230" y="659">product_name · category</text></g>
+<text x="36" y="720" font-size="14">Margin = SUM(net_revenue − cost) / SUM(net_revenue)</text><text x="36" y="746" font-size="12" fill="#94a3b8">Define refund, currency and tax policies before using these measures.</text></g></svg>

@@ -5,7 +5,7 @@ import { fuelScenario, capacityScenario } from "@/lib/policy-scenarios";
 
 const contexts = [
   { eyebrow: "CASE STUDY 01 // POLICY METRICS", badge: "Targeted Fuel Subsidy & Consumption Framework", title: "BUDI MADANI / RON95 Impact Simulator", diagnostic: "Track illustrative B40 and M40 disposable incomes against fuel spending to investigate consumption patterns and potential leakage signals.", predictive: "Simulate fuel price ceilings and eligibility assumptions to compare fiscal savings with household cost exposure and compensatory support options." },
-  { eyebrow: "CASE STUDY 02 // DEMOGRAPHIC DISPERSION", badge: "Resource Optimization & Aid Architecture", title: "Rohingya Refugee Operational Placement Model", diagnostic: "Explore fictional regional service-demand concentrations across Selangor, Penang, and Johor to identify potential healthcare infrastructure bottlenecks.", predictive: "Model decentralized service provision against municipal budgets to compare healthcare capacity constraints. This demonstration allocates service capacity, not people." },
+  { eyebrow: "CASE STUDY 02 // MIGRATION POLICY", badge: "Policy Effectiveness & Malaysian Public Services", title: "Irregular Migration & Public Impact Simulator", diagnostic: "Distinguish irregular entry, unresolved immigration status, employer exploitation and refugee protection needs. Rohingya displacement is a case-study context; UNHCR registration is not legal immunity.", predictive: "Compare hypothetical prevention and lawful case-resolution budgets. Evaluate reductions in irregular status alongside taxpayer cost, service access for Malaysians and protection obligations, without treating ethnicity as a risk score." },
 ] as const;
 
 export function PolicyContext({ index }: { index: number }) {
@@ -67,5 +67,6 @@ export function PolicySimulator({ kind }: { kind: "fuel" | "capacity" }) {
     </Layer>
   </section>;
 }
+
 
 

@@ -3,9 +3,10 @@
 import { useId } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PolicySimulator } from "./policy-simulator";
+import { MigrationPolicyLab } from "./migration-policy-lab";
 
 
-const labTitles = ["Fuel Subsidy Optimization Matrix", "Demographic Allocation Logic"] as const;
+const labTitles = ["Fuel Subsidy Optimization Matrix", "Irregular Migration Policy Lab"] as const;
 
 export type InteractiveLabProps = Readonly<{
   index: number;
@@ -37,10 +38,11 @@ export function InteractiveLab({ index, onSelect }: InteractiveLabProps) {
         <PolicySimulator kind="fuel" />
       </div>
       <div inert={index !== 1} aria-hidden={index !== 1 || undefined} className="col-start-1 row-start-1 min-w-0" style={{ visibility: index === 1 ? "visible" : "hidden" }}>
-        <PolicySimulator kind="capacity" />
+        <MigrationPolicyLab />
       </div>
     </div>
   </section>;
 }
+
 
 

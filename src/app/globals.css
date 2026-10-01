@@ -72,3 +72,12 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+@keyframes pipeline-drift {
+  0%, 100% { transform: translate(-4px, 3px); }
+  33% { transform: translate(5px, -4px); }
+  66% { transform: translate(-2px, -5px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pipeline-drift { animation: pipeline-drift 3s ease-in-out infinite; }
+}

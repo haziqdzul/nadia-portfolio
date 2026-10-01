@@ -78,8 +78,8 @@ export function DeliveryLifecycle() {
   const reducedMotion = useReducedMotion();
   const hydrated = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [playback, setPlayback] = useState<boolean | null>(false);
-  // Manual by default; playback starts only when the visitor chooses Play.
+  const [playback, setPlayback] = useState<boolean | null>(null);
+  // Autoplay after hydration unless reduced motion is preferred; manual controls override it.
   const isPlaying = hydrated && (playback ?? reducedMotion === false);
   const stage = lifecycleStages[activeIndex];
 
@@ -91,7 +91,7 @@ export function DeliveryLifecycle() {
       if (!document.hidden) {
         timer = setInterval(() => {
           setActiveIndex((index) => (index + 1) % lifecycleStages.length);
-        }, 6500);
+        }, 5000);
       }
     }
     synchronizeTimer();
