@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
+import { ProfilePortrait } from "./profile-portrait";
 import Link from "next/link";
 import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 import { InteractiveLab } from "./interactive-lab";
@@ -50,21 +50,14 @@ export function Hero() {
 
             {/* Profile Card & Social Links */}
             <div className="profile-glass mt-9 grid w-full max-w-lg grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-5 gap-y-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-x-6">
-              <Image 
-                src="/images/profile.jpg" 
-                alt="Nadia Irdina" 
-                width={180} 
-                height={180} 
-                sizes="(min-width: 640px) 144px, 112px" 
-                className="aspect-square w-full rounded-2xl object-cover object-top ring-4 ring-white/70 shadow-sm dark:ring-white/10" 
-              />
+              <ProfilePortrait />
               <div className="flex flex-col justify-center">
                 <p className="font-heading text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-white">Nadia Irdina</p>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   A curious mind for data. A practical eye for what comes next.
                 </p>
-                <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                  Based in Malaysia
+                <p className="profile-location mt-3 inline-flex w-fit items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-600 dark:text-slate-300">
+                  <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-emerald-600 dark:bg-emerald-300" />Based in Malaysia
                 </p>
                 
               </div>

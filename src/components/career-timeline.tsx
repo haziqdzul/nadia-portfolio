@@ -62,7 +62,24 @@ export function CareerTimeline() {
           <div aria-label="Choose a career photo" className="mt-4 flex flex-wrap justify-center gap-2">{gallery.map((item, position) => <button key={item.id} type="button" aria-label={`Show career photo ${position + 1}: ${item.title}`} aria-pressed={index === position} onClick={() => select(position)} className={`relative h-12 w-14 overflow-hidden rounded-lg border-2 transition-opacity motion-reduce:transition-none ${position === index ? "border-emerald-600 opacity-100 dark:border-emerald-300" : "border-transparent opacity-55 hover:opacity-100"}`}>{item.format === "video" ? <Play aria-hidden="true" className="mx-auto size-5" /> : <Image src={item.src} alt="" fill sizes="56px" unoptimized={item.format === "gif"} className="object-cover" />}</button>)}</div>
         </section>
       </div>
-      <ol aria-label="Career experience, newest to oldest" className="space-y-3">{entries.map(({ id: entryId, date, title, organization, details, icon: Icon }) => <li key={entryId}><article className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/70"><div className="flex flex-col items-center gap-2"><span className="flex size-10 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950"><Icon aria-hidden="true" className="size-5 text-emerald-800 dark:text-emerald-200" /></span><span className="text-center text-[10px] font-bold leading-4 text-slate-950 dark:text-slate-50">{date}</span></div><div className="min-w-0"><h3 className="text-sm font-bold leading-5 text-slate-950 dark:text-white">{title}</h3><p className="mt-1 text-xs font-medium leading-5 text-slate-600 dark:text-slate-300">{organization}</p><ul className="mt-3 space-y-2 list-disc pl-4 text-xs leading-5 text-slate-700 marker:text-emerald-600 dark:text-slate-200">{details.map((detail) => <li key={detail}>{detail}</li>)}</ul></div></article></li>)}</ol>
+      <ol aria-label="Career experience, newest to oldest" className="career-track relative space-y-4 pl-7 sm:pl-8" data-animate={autoplay && inView}>
+        {entries.map(({ id: entryId, date, title, organization, details, icon: Icon }, position) => (
+          <li key={entryId} className="career-stop relative" data-tone={position === 0 ? "blue" : "violet"}>
+            <span aria-hidden="true" className="career-marker absolute -left-7 top-7 size-3 rounded-full sm:-left-8" />
+            <article className="career-role relative rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <span className="career-date inline-flex rounded-lg px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wide">{date}</span>
+                <Icon aria-hidden="true" className="size-5 shrink-0" />
+              </div>
+              <h3 className="mt-3 text-base font-bold leading-6">{title}</h3>
+              <p className="career-company mt-1 text-sm font-medium">{organization}</p>
+              <ul className="mt-4 list-disc space-y-2 pl-4 text-sm leading-6 text-slate-700 dark:text-slate-200">
+                {details.map((detail) => <li key={detail}>{detail}</li>)}
+              </ul>
+            </article>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>;
 }

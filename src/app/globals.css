@@ -243,8 +243,77 @@
   .profile-social { transition: none; }
   .profile-social:is(:hover, :active) { transform: none; }
 }
+/* Experience: a continuous, softly animated thread between visible roles. */
+.portfolio-colorful .career-band {
+  background: radial-gradient(circle at 15% 30%, #dcf3fc, transparent 55%), linear-gradient(135deg, #f0f9ff, #f2efff);
+}
+.portfolio-colorful #experience { background: transparent; }
+.dark .portfolio-colorful .career-band { background: linear-gradient(135deg, #102737, #201b37); }
+.portfolio-colorful #experience [aria-label="Career media"] {
+  background: rgb(255 255 255 / 75%);
+  border-color: rgb(255 255 255 / 85%);
+  box-shadow: 0 12px 32px rgb(31 112 157 / 8%);
+}
+.career-track::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1.75rem;
+  bottom: 1.75rem;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #38bdf8, #818cf8, #e879b9, #38bdf8);
+  background-size: 100% 250%;
+  animation: career-thread 5s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.career-track[data-animate="true"]::before { animation-play-state: running; }
+.career-stop { --career-accent: #147397; --career-tint: #e5f5fc; }
+.career-stop[data-tone="violet"] { --career-accent: #7552b2; --career-tint: #f0eaff; }
+.career-marker { background: var(--career-accent); box-shadow: 0 0 0 5px var(--career-tint); }
+.portfolio-colorful #experience .career-role { background: rgb(255 255 255 / 80%); box-shadow: 0 4px 18px rgb(56 110 150 / 5%); }
+.portfolio-colorful #experience .career-role .career-date { color: var(--career-accent); background: var(--career-tint); border-color: transparent; }
+.career-company, .career-role li::marker,
+.portfolio-colorful #experience .career-role svg { color: var(--career-accent); }
+.dark .career-stop { --career-accent: #7dd3fc; --career-tint: #163d52; }
+.dark .career-stop[data-tone="violet"] { --career-accent: #c4b5fd; --career-tint: #34264e; }
+.dark .portfolio-colorful #experience .career-role,
+.dark .portfolio-colorful #experience [aria-label="Career media"] { background: rgb(17 30 48 / 85%); border-color: #30435b; }
+@keyframes career-thread {
+  0%, 100% { background-position: 50% 0%; }
+  50% { background-position: 50% 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .career-track::before { animation: none; } }
 @keyframes matcha-greeting {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(-9deg) translateY(-2px); }
   60% { transform: rotate(7deg); }
 }
+
+/* Layered portrait card and reversible 3D portrait. */
+.profile-glass {
+  border-color: rgb(6 78 59 / 9%);
+  border-radius: 2.25rem;
+  background: linear-gradient(125deg, rgb(255 255 255 / 72%), rgb(255 255 255 / 28%));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 8px 20px rgb(29 77 71 / 4%), 0 24px 50px rgb(64 65 110 / 7%);
+}
+.portrait-flip { perspective: 900px; box-shadow: 0 0 0 4px rgb(255 255 255 / 70%), 0 6px 18px rgb(15 23 42 / 10%); }
+.portrait-flip-inner { position: absolute; inset: 0; border-radius: inherit; transform-style: preserve-3d; transition: transform 650ms cubic-bezier(.22,.8,.25,1); }
+.portrait-flip-inner[data-flipped="true"] { transform: rotateY(180deg); }
+.portrait-face { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.portrait-back { transform: rotateY(180deg); }
+.profile-location { border-radius: 999px; background: rgb(209 250 229 / 40%); padding: .4rem .6rem; }
+.dark .profile-location { background: rgb(52 211 153 / 8%); }
+.dark .portrait-flip { box-shadow: 0 0 0 4px rgb(255 255 255 / 12%), 0 6px 18px rgb(0 0 0 / 18%); }
+.footer-mug { overflow: visible; }
+.footer-back span, .footer-back svg { transition: transform 220ms ease; }
+@media (prefers-reduced-motion: no-preference) {
+  .footer-back:is(:hover,:focus-visible) span { transform: translateY(-2px); }
+  .footer-back:is(:hover,:focus-visible) svg { animation: footer-arrow-hop 650ms ease-in-out; }
+  .mug-steam { animation: matcha-steam 2.8s ease-in-out infinite; }
+  .mug-steam:nth-of-type(3) { animation-delay: .4s; }
+  .mug-steam:nth-of-type(4) { animation-delay: .8s; }
+}
+@keyframes footer-arrow-hop { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-6px); } 70% { transform: translateY(-2px); } }
+@keyframes matcha-steam { 0% { opacity: 0; transform: translateY(2px); } 30% { opacity: .8; } 100% { opacity: 0; transform: translate(1px,-4px); } }
+@media (prefers-reduced-motion: reduce) { .portrait-flip-inner { transition: none; } }
