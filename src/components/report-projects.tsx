@@ -25,8 +25,7 @@ export function ReportProjects() {
   return <>
     <section id="portfolio" aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
       <p className="eyebrow">01 / Selected projects</p>
-      <h2 id={`${id}-heading`} className="section-heading mt-4">Selected work, at a glance.</h2>
-      <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">The brief, my contribution, and a preview of the work. Explore each project without needing a background in data analytics.</p>
+      <h2 id={`${id}-heading`} className="section-heading mt-4">From questions to outcomes.</h2>
       <fieldset className="mt-8"><legend className="mb-3 text-xs font-medium text-slate-500 dark:text-slate-400">Browse by type of work</legend><div className="flex flex-wrap gap-2">{categories.map((item) => <button key={item} type="button" aria-pressed={category === item} aria-controls={`${id}-results`} onClick={() => { setCategory(item); }} className={`filter-button ${category === item ? "filter-active" : "filter-idle"}`}>{item === "All" ? "All projects" : item === "Requirements" ? "Business requirements" : item === "Data engineering" ? "Data preparation" : item === "Training & UAT" ? "Training & testing" : item}</button>)}</div></fieldset>
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <p role="status" className="text-xs text-slate-500 dark:text-slate-400">{visible.length} {visible.length === 1 ? "project" : "projects"}</p>

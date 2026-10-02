@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useId, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, ImageOff, Pause, Play } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import type { ReportProject } from "@/lib/projects";
 import { canDisplayMedia, projectMedia, type ProjectMedia } from "@/lib/project-media";
+import { AutoplayProgress } from "./autoplay-progress";
 import { ProjectVisual } from "./project-visual";
 
 function subscribeMotion(callback: () => void) {
@@ -44,13 +45,7 @@ export function ProjectPreviewCarousel({ project }: { project: ReportProject }) 
     setPlaying(false);
     setIndex((current) => (current + direction + total) % total);
   };
-  useEffect(() => {
-    if (!autoPlaying || !inView || hovered || focused || isVideo) return;
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") setIndex((current) => (current + 1) % total);
-    }, 4000);
-    return () => window.clearInterval(timer);
-  }, [autoPlaying, inView, hovered, focused, isVideo, index, total]);
+  const advance = useCallback(() => setIndex((current) => (current + 1) % total), [total]);
 
   return <section ref={root} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }} aria-label={`${project.title} work preview`} aria-roledescription="carousel" className="min-w-0 border-t border-slate-200 bg-slate-50/70 p-5 sm:p-7 lg:border-l lg:border-t-0 dark:border-slate-800 dark:bg-slate-950/40">
     <div className="mb-4 flex items-center justify-between gap-3">
@@ -71,9 +66,8 @@ export function ProjectPreviewCarousel({ project }: { project: ReportProject }) 
     <button type="button" aria-label={`Previous preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(-1)} className="absolute -left-4 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronLeft aria-hidden="true" className="size-4" /></button>
     <button type="button" aria-label={`Next preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(1)} className="absolute -right-4 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronRight aria-hidden="true" className="size-4" /></button>
     </div>
-    <div aria-live={autoPlaying ? "off" : "polite"} aria-atomic="true" className="mt-3 grid">
-      {[null, ...media].map((entry, position) => <p key={entry?.id ?? "overview"} aria-hidden={index !== position} style={{ gridArea: "1 / 1", visibility: index === position ? "inherit" : "hidden" }} className="text-xs leading-5 text-slate-500 dark:text-slate-400"><span className="block font-medium text-slate-700 dark:text-slate-300">{entry?.title ?? "Work overview"}</span>{entry?.caption ?? "Illustrative work preview. No client records or restricted screenshots."}</p>)}
-    </div>
+    <AutoplayProgress step={index} running={autoPlaying && inView && !hovered && !focused && !isVideo} onAdvance={advance} />
+    <p className="sr-only" aria-live={autoPlaying ? "off" : "polite"}>{media[index - 1]?.caption ?? "Illustrative work overview"}</p>
   </section>;
 }
 

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -46,12 +47,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <SiteHeader />
             {children}
 
-            <footer className="border-t border-slate-200 py-8 dark:border-slate-800">
-              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 text-sm text-slate-600 sm:flex-row sm:justify-between dark:text-slate-400">
-                <p>Nadia Irdina · Data Translator & Strategic Storyteller</p>
-                <p>Built with care, Next.js, and curiosity.</p>
-              </div>
-            </footer>
+            <SiteFooter />
           </div>
         </Providers>
       </body>
