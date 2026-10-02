@@ -81,3 +81,125 @@
 @media (prefers-reduced-motion: no-preference) {
   .pipeline-drift { animation: pipeline-drift 3s ease-in-out infinite; }
 }
+
+/* Colorful portfolio skin: presentation only; section interactions stay unchanged. */
+.portfolio-colorful {
+  --portfolio-ink: #0b2840;
+  --portfolio-copy: #27516a;
+  --portfolio-muted: #526c82;
+  --portfolio-blue: #16698b;
+  --portfolio-pink: #a73570;
+  background: #fff;
+  color: var(--portfolio-ink);
+}
+.dark .portfolio-colorful {
+  --portfolio-ink: #eef5ff;
+  --portfolio-copy: #c5d7e8;
+  --portfolio-muted: #a4b8cf;
+  --portfolio-blue: #86d4f1;
+  --portfolio-pink: #f4a2c9;
+  background: #0c1426;
+}
+.portfolio-colorful h1,
+.portfolio-colorful .section-heading,
+.portfolio-colorful #portfolio h3,
+.portfolio-colorful #experience h3 { color: var(--portfolio-ink); }
+.portfolio-colorful .section-heading { font-weight: 800; letter-spacing: -0.045em; }
+.portfolio-colorful .eyebrow { color: var(--portfolio-blue); letter-spacing: 0.18em; }
+.portfolio-colorful main > section:first-child {
+  background: radial-gradient(ellipse at 5% 5%, #cfedf6 0, transparent 48%), radial-gradient(ellipse at 100% 90%, #fbddec 0, transparent 52%), linear-gradient(135deg, #eff8ff, #f6f0ff);
+  border: 0;
+}
+.dark .portfolio-colorful main > section:first-child {
+  background: radial-gradient(ellipse at 0 0, #153748 0, transparent 50%), radial-gradient(ellipse at 100% 100%, #34203e 0, transparent 50%), #101a2e;
+}
+.hero-gradient-text { color: #7659ad; }
+@supports (background-clip: text) {
+  .hero-gradient-text > span {
+    background-image: linear-gradient(100deg, #187798 5%, #8251a9 55%, #bb3d78 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .dark .hero-gradient-text > span { background-image: linear-gradient(100deg, #70cef0, #c0a1f0, #f5a1c7); }
+}
+.portfolio-colorful .action-button {
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(110deg, #146d90, #7253a0 55%, #a73b73);
+  box-shadow: 0 5px 18px rgb(98 79 155 / 15%);
+}
+.portfolio-colorful .action-button:hover { filter: brightness(1.08); }
+.portfolio-colorful .filter-button { border-radius: 999px; }
+.portfolio-colorful .filter-active { background: #176c89; border-color: #176c89; color: #fff; }
+.portfolio-colorful .filter-idle { border-color: #dce9f3; background: #f6fbff; color: #27516a; }
+.dark .portfolio-colorful .filter-idle { border-color: #30435f; background: #17243b; color: #c5d7e8; }
+.portfolio-colorful > div > header { border-color: #e1edf6; background: rgb(246 250 255 / 94%); }
+.dark .portfolio-colorful > div > header { background: rgb(12 20 38 / 95%); border-color: #263752; }
+.portfolio-colorful header > div[aria-hidden="true"] { background: linear-gradient(90deg, #2b9abb, #9d77cf, #e184ae); }
+.portfolio-colorful #portfolio > div > ul { gap: 1.5rem; }
+.portfolio-colorful #portfolio > div > ul > li { --project-accent: #a73570; }
+.portfolio-colorful #portfolio > div > ul > li:nth-child(3n + 2) { --project-accent: #15755c; }
+.portfolio-colorful #portfolio > div > ul > li:nth-child(3n) { --project-accent: #176f97; }
+.portfolio-colorful #portfolio article {
+  border-color: #deebf5;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 4px 22px rgb(44 104 145 / 6%);
+}
+.portfolio-colorful #portfolio article h3 { font-weight: 800; }
+.portfolio-colorful #portfolio article [aria-label="My contribution"] svg,
+.portfolio-colorful #portfolio article .uppercase { color: var(--project-accent); }
+.portfolio-colorful #portfolio article [aria-label="Tools and skills"] li {
+  border-radius: 999px;
+  background: #eff8ff;
+  color: #275d7b;
+}
+.portfolio-colorful #portfolio article > div > section { background: #f7fbff; border-color: #e2edf5; }
+.dark .portfolio-colorful #portfolio article { background: #131f34; border-color: #2a3a55; box-shadow: none; }
+.dark .portfolio-colorful #portfolio article > div > section { background: #101a2b; border-color: #2a3a55; }
+.dark .portfolio-colorful #portfolio article [aria-label="Tools and skills"] li { background: #20334b; color: #bddef4; }
+.dark .portfolio-colorful #portfolio > div > ul > li { --project-accent: #f0a3c6; }
+.dark .portfolio-colorful #portfolio > div > ul > li:nth-child(3n + 2) { --project-accent: #81d4b7; }
+.dark .portfolio-colorful #portfolio > div > ul > li:nth-child(3n) { --project-accent: #84cff0; }
+.portfolio-colorful #how { background: #f7f3ff; }
+.portfolio-colorful #experience { background: #fff3f9; border-radius: 2rem; }
+.portfolio-colorful #about { background: #f0f8ff; border-color: #e4eef8; }
+.portfolio-colorful #experience article { border-color: transparent; background: rgb(255 255 255 / 90%); box-shadow: 0 2px 12px rgb(123 74 106 / 3%); }
+.portfolio-colorful #experience article h3 { font-weight: 750; }
+.portfolio-colorful #experience article svg { color: var(--portfolio-pink); }
+.portfolio-colorful #experience article > div > span:first-child { background: #fff0f7; border-color: #f6dbe9; }
+.dark .portfolio-colorful #how { background: #19172e; }
+.dark .portfolio-colorful #experience { background: #231a2d; }
+.dark .portfolio-colorful #about { background: #111f32; border-color: #263750; }
+.dark .portfolio-colorful #experience article { background: #171f33; border-color: #303047; }
+.dark .portfolio-colorful #experience article > div > span:first-child { background: #352239; border-color: #513449; }
+.portfolio-colorful #contact { background: #08213a; color: #eff7ff; border-radius: 2rem; margin-block: 3rem; }
+.portfolio-colorful #contact h2,
+.portfolio-colorful #contact h2 span,
+.portfolio-colorful #contact a { color: #f1f7ff; }
+.portfolio-colorful #contact p { color: #bed2e3; }
+.portfolio-colorful #contact .eyebrow { color: #99d8ee; }
+.portfolio-colorful #contact .filter-idle { background: #173a55; border-color: #31526e; color: #eff7ff; }
+.portfolio-colorful #contact .border-t { border-color: #31526e; }
+@media (max-width: 639px) {
+  .portfolio-colorful #experience,
+  .portfolio-colorful #contact { border-radius: 0; }
+}
+
+/* Fit the headline to its column rather than the zoom-dependent viewport. */
+.hero-intro { width: 100%; min-width: 0; container-type: inline-size; }
+.hero-title { font-size: min(5.5rem, 12cqi); line-height: 1.18; }
+.hero-gradient-text { display: block; }
+/* Gradient clipping needs room for glyph overhang on every edge, especially
+   the final s with tight tracking and the g descender during transforms. */
+.hero-gradient-text > span {
+  padding: 0.12em 0.1em 0.2em;
+  margin: -0.12em -0.1em -0.2em;
+  overflow: visible;
+}
+.portfolio-colorful .career-band { background: #fff3f9; }
+.dark .portfolio-colorful .career-band { background: #231a2d; }
+.portfolio-colorful .contact-band { background: #08213a; }
+.portfolio-colorful #experience,
+.portfolio-colorful #contact { border-radius: 0; margin-block: 0; }

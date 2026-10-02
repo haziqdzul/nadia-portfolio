@@ -10,6 +10,8 @@ export type ProjectMedia = Readonly<{
   height: number;
   isClearedForPublic: boolean;
   isAvailable: boolean;
+  format?: "image" | "gif" | "video";
+  captionsSrc?: `/images/${string}`;
   dateLabel?: string;
   metric?: Readonly<{ value: string; label: string; context: string }>;
 }>;

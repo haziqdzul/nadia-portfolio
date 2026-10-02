@@ -33,7 +33,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jakarta.variable}`}>
+      <body className={`${inter.variable} ${jakarta.variable} portfolio-colorful`}>
         <Providers>
           <a
             href="#main-content"

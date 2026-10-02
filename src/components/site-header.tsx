@@ -7,7 +7,6 @@ import { useTheme } from "next-themes";
 
 const navigation = [
   { label: "Portfolio", id: "portfolio" },
-  { label: "Skills", id: "skills" },
   { label: "How I work", id: "how" },
   { label: "Experience", id: "experience" },
   { label: "About", id: "about" },

@@ -29,13 +29,13 @@ export function HeroIntro() {
           {paused ? <Play aria-hidden="true" className="size-3.5" /> : <Pause aria-hidden="true" className="size-3.5" />}
         </button>
       </div>
-      <h1 id="hero-heading" className="mt-5 text-[clamp(3.1rem,6.5vw,5.5rem)] font-semibold leading-[1.06] tracking-[-0.065em]">
+      <h1 id="hero-heading" className="hero-title mt-5 font-extrabold tracking-[-0.05em]">
         <span className="sr-only">Data speaks. Insights follow.</span>
         <span aria-hidden="true">
           <span className="hero-data inline-block">Data</span>{" "}
           <span className="hero-speaks inline-block">speaks.</span>
           <br />
-          <span className="text-emerald-800 dark:text-emerald-300">
+          <span className="hero-gradient-text whitespace-nowrap">
             <span className="hero-insights inline-block">Insights</span>{" "}
             <span className="hero-follows inline-block">follow.</span>
           </span>

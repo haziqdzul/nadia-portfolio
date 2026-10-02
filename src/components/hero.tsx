@@ -26,10 +26,10 @@ export function Hero() {
       <div className="mx-auto max-w-6xl px-6 pb-12 pt-16 sm:pt-24 lg:pt-28">
         
         {/* Parent layout grid wrapper */}
-        <div className="grid items-start gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-20">
+        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-20">
           
           {/* Left Column Container */}
-          <div className="flex flex-col items-start w-full">
+          <div className="flex min-w-0 flex-col items-start w-full">
             {/* Always Visible: Your main header */}
             <HeroIntro />
             

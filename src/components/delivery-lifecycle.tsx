@@ -9,6 +9,7 @@ export type LifecycleStage = Readonly<{
   tagline: string;
   description: string;
   deliverables: readonly string[];
+  tools: readonly string[];
   experienceMilestones: readonly string[];
 }>;
 
@@ -16,6 +17,7 @@ export type LifecycleStage = Readonly<{
 export const lifecycleStages = [
   {
     title: "Requirements gathering",
+    tools: ["Requirements definition","Metric definition"],
     tagline: "Start with the decision",
     description: "I clarify the decision a team needs to make, then define the questions, measures, and source data needed to support it. Agreeing the scope early gives everyone a shared direction.",
     deliverables: ["Scope and requirements brief", "Agreed metric definitions", "Platform requirements review"],
@@ -23,6 +25,7 @@ export const lifecycleStages = [
   },
   {
     title: "SME engagement",
+    tools: ["SME workshops","Thematic analysis"],
     tagline: "Make expertise reusable",
     description: "I work with subject-matter experts to surface business rules, data gaps, and operational context. Workshop findings become structured input that the delivery team can use and validate.",
     deliverables: ["Structured expert findings", "Facilitated discovery workshops", "Follow-up coaching notes"],
@@ -30,6 +33,7 @@ export const lifecycleStages = [
   },
   {
     title: "Business process analysis",
+    tools: ["Process mapping","Use-case analysis"],
     tagline: "Follow the real workflow",
     description: "I trace how information and decisions move through a service, documenting handoffs and friction points. Those workflows guide the use cases and reporting requirements.",
     deliverables: ["Current-state workflow maps", "Process gaps and pain points", "Mapped business use cases"],
@@ -37,6 +41,7 @@ export const lifecycleStages = [
   },
   {
     title: "Data cleaning & transformation",
+    tools: ["SQL","Oracle","Doris / StarRocks"],
     tagline: "Build a dependable foundation",
     description: "I assess source readiness, standardize structures and types, and record inconsistencies for review. Transformations stay explicit so issues can be traced back to their origin.",
     deliverables: ["Data readiness assessment", "Schema mappings and Oracle DDL", "Source-data issue register"],
@@ -44,6 +49,7 @@ export const lifecycleStages = [
   },
   {
     title: "Dashboard design",
+    tools: ["Tableau","Data visualization"],
     tagline: "Make the next question easy",
     description: "I organize dashboards around the decisions users make most often. Clear summaries, consistent filters, and accessible detail help people investigate without losing context.",
     deliverables: ["Decision-focused Tableau views", "KPI and visualization specifications", "Consistent cross-filter behavior"],
@@ -51,6 +57,7 @@ export const lifecycleStages = [
   },
   {
     title: "UAT facilitation",
+    tools: ["UAT scenarios","Defect tracking"],
     tagline: "Make acceptance evidence-based",
     description: "I help users test realistic scenarios against agreed requirements. Findings are recorded with owners and follow-up actions, giving the team a clear basis for acceptance.",
     deliverables: ["UAT scenarios and test sessions", "Defect logs and follow-up tracking", "PAT / TOT / TOK coordination"],
@@ -58,6 +65,7 @@ export const lifecycleStages = [
   },
   {
     title: "Delivery & training",
+    tools: ["User training","Acceptance testing"],
     tagline: "Support adoption beyond launch",
     description: "I prepare users to work confidently with the system, support the transition into live use, and follow through on acceptance activities so delivery leads to practical adoption.",
     deliverables: ["User training and guidance", "Go-live assistance", "Final acceptance support"],
@@ -124,7 +132,7 @@ export function DeliveryLifecycle() {
   return (
     <section ref={sectionRef} id="how" aria-labelledby={`${id}-heading`} className="scroll-mt-20 bg-slate-50 py-20 text-slate-900 dark:bg-[#0b0f17] dark:text-zinc-100 sm:py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">03 / How I work</p>
+        <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">02 / How I work</p>
         <div className="mb-9 flex flex-wrap items-end justify-between gap-6">
           <h2 id={`${id}-heading`} className="section-heading">My contribution across the delivery lifecycle</h2>
           <div className="flex shrink-0 items-center gap-3">
@@ -178,6 +186,10 @@ export function DeliveryLifecycle() {
                     <ul className="mt-3 space-y-3">{items.map((item) => <li key={item} className="flex gap-2.5 text-sm leading-6 text-slate-700 dark:text-zinc-200"><span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-[1px] bg-emerald-700 dark:bg-emerald-200/80" />{item}</li>)}</ul>
                   </div>
                 ))}
+              </div>
+              <div className="mt-6 border-t border-slate-200 pt-5 dark:border-white/10">
+                <h4 className="font-mono text-[11px] uppercase tracking-wider text-slate-600 dark:text-zinc-400">Tools & methods used</h4>
+                <ul className="mt-3 flex flex-wrap gap-2">{stage.tools.map((tool) => <li key={tool} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-200">{tool}</li>)}</ul>
               </div>
             </motion.div>
           </div>

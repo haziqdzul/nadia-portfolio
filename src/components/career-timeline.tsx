@@ -1,113 +1,72 @@
 "use client";
+import Image from "next/image";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { BriefcaseBusiness, GraduationCap, Flag, Rocket, ClipboardCheck, Users, ChevronLeft, ChevronRight, Pause, Play, type LucideIcon } from "lucide-react";
+import { motion, useInView } from "motion/react";
+import { projectMedia, canDisplayMedia } from "@/lib/project-media";
+import { PreviewMedia } from "./project-preview-carousel";
 
-import { useId, useState } from "react";
-
-type Milestone = Readonly<{
+type CareerEntry = Readonly<{
   id: string;
-  label: string;
   date: string;
-  month: string;
-  description: string;
+  title: string;
+  organization: string;
+  achievement: string;
+  icon: LucideIcon;
 }>;
 
-const milestones = [
-  { id: "training", label: "Training", date: "2025-02", month: "February", description: "User training ahead of the STATSDW rollout." },
-  { id: "uat", label: "UAT", date: "2025-03", month: "March", description: "User acceptance testing for the STATSDW platform." },
-  { id: "pat", label: "PAT / TOT / TOK", date: "2025-04", month: "April", description: "The PAT, TOT and TOK delivery milestone." },
-  { id: "launch", label: "Go-live", date: "2025-06", month: "June", description: "STATSDW go-live milestone." },
-  { id: "fat", label: "FAT", date: "2025-07", month: "July", description: "The final acceptance testing milestone following go-live." },
-] as const satisfies readonly Milestone[];
+// Ongoing role first, followed by dated milestones in descending order.
+const entries: readonly CareerEntry[] = [
+  { id: "current", date: "2026 / Present", title: "Business Intelligence Analyst", organization: "DataMicron System Sdn Bhd · 2024–present", achievement: "Structured expert input into nine enforcement use cases and supported the STATSDW platform rollout.", icon: BriefcaseBusiness },
+  { id: "acceptance", date: "Jul 2025", title: "Final acceptance testing", organization: "DOSM · STATSDW", achievement: "Supported final acceptance activities following the national statistics platform’s June go-live.", icon: ClipboardCheck },
+  { id: "launch", date: "Jun 2025", title: "National platform go-live", organization: "DOSM · STATSDW", achievement: "Contributed requirements, data-readiness and user support to the STATSDW launch.", icon: Rocket },
+  { id: "handover", date: "Apr 2025", title: "Acceptance & knowledge transfer", organization: "DOSM · STATSDW", achievement: "Supported PAT, TOT and TOK coordination to prepare teams for platform handover.", icon: Flag },
+  { id: "uat", date: "Mar 2025", title: "User acceptance testing", organization: "DOSM · STATSDW", achievement: "Helped users test agreed scenarios and track findings for follow-up before launch.", icon: ClipboardCheck },
+  { id: "training", date: "Feb 2025", title: "User training", organization: "DOSM · STATSDW", achievement: "Supported user training ahead of rollout so teams could prepare for the new platform.", icon: Users },
+  { id: "degree", date: "2020–2024", title: "BSc (Hons) Statistics", organization: "UiTM Shah Alam", achievement: "Built the statistical foundation now applied to consultant profiling and climate-risk analysis.", icon: GraduationCap },
+];
 
-type MilestoneId = (typeof milestones)[number]["id"];
-
-// Year-level ranges from the reference; no precise employment months implied.
-const roles = [
-  { id: "analyst", title: "Business Intelligence Analyst", organization: "DataMicron System Sdn Bhd", period: "2024 – present", start: 2024, end: 2026, current: true },
-  { id: "intern", title: "Intern, ESG & climate risk", organization: "MCIS Insurance Berhad", period: "Dates not specified", start: null, end: null, current: false },
-  { id: "degree", title: "BSc (Hons) Statistics", organization: "UiTM Shah Alam", period: "2020 – 2024", start: 2020, end: 2024, current: false },
-] as const;
-
-const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026] as const;
-
+const gallery = projectMedia.filter(canDisplayMedia);
+function subscribeMotion(callback: () => void) {
+  const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+const readMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const serverMotion = () => true;
 export function CareerTimeline() {
   const id = useId();
-  const [selected, setSelected] = useState<MilestoneId>("launch");
-  const active = milestones.find((milestone) => milestone.id === selected)!;
-
-  return (
-    <section id="experience" aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl scroll-mt-24 px-6 py-20 sm:py-28">
-      <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">Experience</p>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <h2 id={`${id}-heading`} className="section-heading">Career timeline</h2>
-        <p className="max-w-sm text-sm leading-6 text-slate-600 dark:text-slate-300">Select a milestone to see its role in the delivery sequence.</p>
-      </div>
-
-      <div className="mt-8 rounded-xl border border-slate-200 bg-white/75 p-5 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900/70">
-        <div aria-hidden="true" className="mb-2 hidden grid-cols-[15rem_1fr] gap-6 md:grid">
-          <span className="text-xs text-slate-500 dark:text-slate-400">Year-level overview</span>
-          <div className="grid grid-cols-7 font-mono text-xs text-slate-500 dark:text-slate-400">{years.map((year) => <span key={year}>{year}</span>)}</div>
-        </div>
-
-        <ol className="divide-y divide-slate-200 dark:divide-slate-700">
-          {roles.filter((role) => role.start !== null).map((role) => (
-            <li key={role.id} className="grid gap-4 py-6 md:grid-cols-[15rem_1fr] md:items-center md:gap-6">
-              <div>
-                <h3 className="font-semibold">{role.title}</h3>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{role.organization}</p>
-                <p className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-300">{role.period}</p>
-              </div>
-              <div aria-hidden="true" className="relative hidden min-h-12 grid-cols-7 items-center md:grid">
-                <div className="pointer-events-none absolute inset-0 grid grid-cols-7">{years.map((year) => <span key={year} className="border-l border-slate-200/70 dark:border-slate-700/50" />)}</div>
-                {role.start !== null && role.end !== null ? (
-                  <div
-                    style={{ gridColumn: `${role.start - 2020 + 1} / ${role.end - 2020 + 2}` }}
-                    className={`relative mx-1 h-7 rounded-md border ${role.current ? "border-emerald-600 bg-emerald-600 dark:border-emerald-300 dark:bg-emerald-300" : "border-emerald-400 bg-emerald-100 dark:border-emerald-500 dark:bg-emerald-400/10"}`}
-                  >
-                    {role.current && <span className="absolute -right-1 top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-white bg-emerald-700 dark:border-slate-900 dark:bg-emerald-200" />}
-                  </div>
-                ) : <span className="relative col-span-7 px-3 text-xs text-slate-500 dark:text-slate-400">Dates to be confirmed</span>}
-              </div>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-5 border-t border-slate-200 pt-5 dark:border-slate-700"><p className="eyebrow">Additional experience</p><h3 className="mt-2 font-semibold">Intern, ESG &amp; climate risk</h3><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">MCIS Insurance Berhad</p></div>
-
-        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-600 dark:text-slate-400" aria-label="Timeline legend">
-          <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm bg-emerald-600 dark:bg-emerald-300" />Current role</span>
-          <span className="flex items-center gap-2"><span aria-hidden="true" className="size-3 rounded-sm border border-emerald-400" />Past</span>
-          <span className="flex items-center gap-2"><span aria-hidden="true" className="size-2.5 rotate-45 border border-emerald-400" />Milestone</span>
-        </div>
-
-        <div className="mt-8 border-t border-slate-200 pt-8 dark:border-slate-700">
-          <h3 className="text-lg font-semibold">DOSM STATSDW milestones</h3>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Training → FAT · 2025</p>
-          <ul aria-label="Select a delivery milestone" className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {milestones.map((milestone) => (
-              <li key={milestone.id}>
-                <button
-                  type="button"
-                  aria-pressed={selected === milestone.id}
-                  aria-controls={`${id}-detail`}
-                  onPointerEnter={(event) => { if (event.pointerType === "mouse") setSelected(milestone.id); }}
-                  onFocus={() => setSelected(milestone.id)}
-                  onClick={() => setSelected(milestone.id)}
-                  className={`flex min-h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border px-2 py-4 text-center text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 motion-reduce:transition-none ${selected === milestone.id ? "border-emerald-600 bg-emerald-50 text-emerald-900 dark:border-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-200" : "border-slate-200 text-slate-600 hover:border-emerald-400 dark:border-slate-700 dark:text-slate-300"}`}
-                >
-                  <span aria-hidden="true" className={`size-3 rotate-45 border border-current ${selected === milestone.id ? "bg-current" : ""}`} />
-                  <span className="font-semibold">{milestone.label}</span>
-                  <time dateTime={milestone.date}>{milestone.month} 2025</time>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <div id={`${id}-detail`} role="status" aria-live="polite" aria-atomic="true" className="mt-5 min-h-32 rounded-xl bg-emerald-50 p-5 dark:bg-slate-950/70">
-            <p className="font-mono text-xs text-emerald-700 dark:text-emerald-300"><time dateTime={active.date}>{active.month} 2025</time></p>
-            <h4 className="mt-2 font-semibold">{active.label}</h4>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{active.description}</p>
+  const [index, setIndex] = useState(0);
+  const reduce = useSyncExternalStore(subscribeMotion, readMotion, serverMotion);
+  const root = useRef<HTMLElement>(null);
+  const inView = useInView(root, { amount: 0.3 });
+  const [playing, setPlaying] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const autoplay = playing && !reduce && gallery.length > 1;
+  const video = gallery[index]?.format === "video";
+  const select = (next: number) => { setPlaying(false); setIndex(next); };
+  const change = (direction: number) => select((index + direction + gallery.length) % gallery.length);
+  useEffect(() => {
+    if (!autoplay || !inView || hovered || focused || video) return;
+    const timer = window.setInterval(() => { if (!document.hidden) setIndex((current) => (current + 1) % gallery.length); }, 4000);
+    return () => window.clearInterval(timer);
+  }, [autoplay, inView, hovered, focused, video, index]);
+  return <section id="experience" aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl scroll-mt-24 px-6 py-20 sm:py-28">
+    <p className="eyebrow">03 / Experience</p><h2 id={`${id}-heading`} className="section-heading mt-4 text-slate-950 dark:text-slate-50">Career, in milestones.</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300">From a foundation in statistics to supporting real-world data platforms. Roles, contributions and delivery milestones—newest first.</p>
+    <div className="mt-9 grid items-start gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] lg:gap-10">
+      <div className="min-w-0 space-y-5 lg:sticky lg:top-28">
+        <section ref={root} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }} aria-label="Career media" aria-roledescription="carousel" className="overflow-hidden rounded-3xl border border-emerald-100 bg-white p-3 shadow-lg shadow-emerald-950/5 sm:p-4 dark:border-slate-700 dark:bg-slate-900">
+          <div className="mb-4 flex items-center justify-between gap-3"><h3 className="text-sm font-semibold text-slate-950 dark:text-white">Work & moments</h3><div className="flex items-center gap-2"><button type="button" disabled={reduce || gallery.length < 2} aria-label={autoplay ? "Pause career photos" : "Play career photos"} onClick={() => setPlaying(!playing)} className="flex size-11 items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:text-slate-200 dark:hover:bg-slate-800">{autoplay ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}</button><span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-[11px] text-slate-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-slate-100">{gallery.length ? index + 1 : 0} / {gallery.length}</span></div></div>
+          <div className="relative"><div id={`${id}-media`} className="relative aspect-[16/10] overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-950"><motion.div initial={false} animate={{ x: `-${index * 100}%` }} transition={{ duration: reduce ? 0 : 0.45, ease: "easeOut" }} className="flex h-full w-full">{gallery.map((item, position) => <div key={item.id} role="group" aria-roledescription="slide" aria-label={`${position + 1} of ${gallery.length}: ${item.title}`} aria-hidden={position !== index} inert={position !== index} className="relative flex h-full w-full shrink-0 items-center justify-center">{(item.format !== "video" || position === index) && <PreviewMedia item={item} />}</div>)}</motion.div>{!gallery.length && <p className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-slate-600 dark:text-slate-300">Cleared career photos will appear here.</p>}</div>
+            <button type="button" onClick={() => change(-1)} disabled={gallery.length < 2} aria-label="Previous career photo" aria-controls={`${id}-media`} className="absolute left-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-950 shadow-sm hover:bg-slate-100 disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-white"><ChevronLeft aria-hidden="true" className="size-5" /></button><button type="button" onClick={() => change(1)} disabled={gallery.length < 2} aria-label="Next career photo" aria-controls={`${id}-media`} className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-950 shadow-sm hover:bg-slate-100 disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800 dark:text-white"><ChevronRight aria-hidden="true" className="size-5" /></button>
           </div>
-        </div>
+          <div aria-live={autoplay ? "off" : "polite"} aria-atomic="true" className="mt-4 grid">{gallery.map((item, position) => <p key={item.id} aria-hidden={position !== index} style={{ gridArea: "1 / 1", visibility: position === index ? "inherit" : "hidden" }} className="text-xs leading-5 text-slate-600 dark:text-slate-300"><span className="mb-1 block font-semibold text-slate-950 dark:text-white">{item.title}</span>{item.caption}</p>)}</div>
+          <div aria-label="Choose a career photo" className="mt-4 flex flex-wrap justify-center gap-2">{gallery.map((item, position) => <button key={item.id} type="button" aria-label={`Show career photo ${position + 1}: ${item.title}`} aria-pressed={index === position} onClick={() => select(position)} className={`relative h-12 w-14 overflow-hidden rounded-lg border-2 transition-opacity motion-reduce:transition-none ${position === index ? "border-emerald-600 opacity-100 dark:border-emerald-300" : "border-transparent opacity-55 hover:opacity-100"}`}>{item.format === "video" ? <Play aria-hidden="true" className="mx-auto size-5" /> : <Image src={item.src} alt="" fill sizes="56px" unoptimized={item.format === "gif"} className="object-cover" />}</button>)}</div>
+        </section>
+        <aside className="rounded-xl border border-slate-200 bg-slate-100/60 p-5 dark:border-slate-700 dark:bg-slate-900/60" aria-labelledby={`${id}-internship`}><p className="text-xs font-medium text-slate-600 dark:text-slate-300">Additional experience · dates to be confirmed</p><h3 id={`${id}-internship`} className="mt-2 font-semibold text-slate-950 dark:text-white">ESG & climate-risk intern</h3><p className="mt-1 text-sm text-slate-700 dark:text-slate-200">MCIS Insurance Berhad</p><p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">Contributed statistical analysis to sustainability and climate-risk questions in insurance.</p></aside>
       </div>
-    </section>
-  );
+      <ol aria-label="Career milestones, newest to oldest" className="space-y-3">{entries.map(({ id: entryId, date, title, organization, achievement, icon: Icon }) => <li key={entryId}><article className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/70"><div className="flex flex-col items-center gap-2"><span className="flex size-10 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950"><Icon aria-hidden="true" className="size-5 text-emerald-800 dark:text-emerald-200" /></span><span className="text-center text-[10px] font-bold leading-4 text-slate-950 dark:text-slate-50">{date}</span></div><div className="min-w-0"><h3 className="text-sm font-bold leading-5 text-slate-950 dark:text-white">{title}</h3><p className="mt-1 text-xs font-medium leading-5 text-slate-600 dark:text-slate-300">{organization}</p><ul className="mt-1.5 list-disc pl-4 text-xs leading-5 text-slate-700 marker:text-emerald-600 dark:text-slate-200"><li>{achievement}</li></ul></div></article></li>)}</ol>
+    </div>
+  </section>;
 }
-
