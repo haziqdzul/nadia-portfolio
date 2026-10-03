@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useId, useRef, useState, useSyncExternalStore } from "react";
-import { ChevronLeft, ChevronRight, ImageOff, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import type { ReportProject } from "@/lib/projects";
 import { canDisplayMedia, projectMedia, type ProjectMedia } from "@/lib/project-media";
@@ -47,15 +47,15 @@ export function ProjectPreviewCarousel({ project }: { project: ReportProject }) 
   };
   const advance = useCallback(() => setIndex((current) => (current + 1) % total), [total]);
 
-  return <section ref={root} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }} aria-label={`${project.title} work preview`} aria-roledescription="carousel" className="min-w-0 border-t border-slate-200 bg-slate-50/70 p-5 sm:p-7 lg:border-l lg:border-t-0 dark:border-slate-800 dark:bg-slate-950/40">
-    <div className="mb-4 flex items-center justify-between gap-3">
+  return <section ref={root} tabIndex={0} onClick={() => setPlaying(false)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocusCapture={() => setFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }} aria-label={`${project.title} work preview`} aria-roledescription="carousel" className="project-preview flex flex-col min-w-0 border-t border-slate-200 bg-slate-50/70 p-6 sm:p-8 lg:border-l lg:border-t-0 dark:border-slate-800 dark:bg-slate-950/40">
+    <div className="mb-4 flex min-h-11 items-center justify-between gap-3">
       <h4 className="eyebrow">Work preview</h4>
       <div className="flex items-center gap-2">
-        <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{index + 1} / {total}</span>
-        <button type="button" disabled={!!reducedMotion || total < 2} aria-label={`${autoPlaying ? "Pause" : "Play"} previews: ${project.title}`} onClick={() => setPlaying(!playing)} className="flex min-h-11 items-center gap-2 rounded-lg px-2 text-xs text-slate-600 disabled:opacity-50 dark:text-slate-300">{autoPlaying ? <Pause aria-hidden="true" className="size-3" /> : <Play aria-hidden="true" className="size-3" />}{reducedMotion ? "Reduced motion" : autoPlaying ? "Pause" : "Play"}</button>
+        <span className="font-mono text-xs font-medium text-slate-600 dark:text-slate-300">{index + 1} / {total}</span>
+        
       </div>
     </div>
-    <div className="relative">
+    <div className="relative mt-auto">
     <div id={id} className="relative h-72 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
       <motion.div initial={false} animate={{ x: `-${index * 100}%` }} transition={{ duration: reducedMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }} className="flex h-full w-full">
         {[null, ...media].map((entry, position) => <div key={entry?.id ?? "overview"} role="group" aria-roledescription="slide" aria-label={`${position + 1} of ${total}: ${entry?.title ?? "Work overview"}`} aria-hidden={position !== index} inert={position !== index} className="relative flex h-full w-full shrink-0 items-center justify-center">
@@ -63,11 +63,12 @@ export function ProjectPreviewCarousel({ project }: { project: ReportProject }) 
         </div>)}
       </motion.div>
     </div>
-    <button type="button" aria-label={`Previous preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(-1)} className="absolute -left-4 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronLeft aria-hidden="true" className="size-4" /></button>
-    <button type="button" aria-label={`Next preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(1)} className="absolute -right-4 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronRight aria-hidden="true" className="size-4" /></button>
+    <button type="button" aria-label={`Previous preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(-1)} className="preview-arrow absolute left-3 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronLeft aria-hidden="true" className="size-4" /></button>
+    <button type="button" aria-label={`Next preview: ${project.title}`} aria-controls={id} disabled={total < 2} onClick={() => change(1)} className="preview-arrow absolute right-3 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white shadow-md hover:bg-emerald-50 disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"><ChevronRight aria-hidden="true" className="size-4" /></button>
     </div>
     <AutoplayProgress step={index} running={autoPlaying && inView && !hovered && !focused && !isVideo} onAdvance={advance} />
     <p className="sr-only" aria-live={autoPlaying ? "off" : "polite"}>{media[index - 1]?.caption ?? "Illustrative work overview"}</p>
   </section>;
 }
+
 

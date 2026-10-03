@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw } from "lucide-react";
 
 const stages = ["Raw", "Cleaned", "Insight"] as const;
 type Stage = (typeof stages)[number];
@@ -116,7 +116,7 @@ export function ProjectSandbox({ title = "Data pipeline", className = "" }: Proj
           ))}
         </div>
 
-          <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${stage}`} tabIndex={0} className="mt-4 rounded-lg">
+          <div onMouseEnter={() => setPlaying(false)} onClick={() => setPlaying(false)} role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${stage}`} tabIndex={0} className="mt-4 rounded-lg">
                 <p className="min-h-16 text-sm leading-6 text-slate-600 dark:text-slate-300">{explanations[stage]}</p>
                 <svg viewBox="0 0 440 270" role="img" aria-label={`${title}: ${stage}. ${summaries[stage]}`} className="block h-auto w-full rounded-xl bg-slate-50 dark:bg-slate-900/70">
                   {[60, 110, 160, 210].map((y) => <line key={y} x1="30" x2="410" y1={y} y2={y} className="stroke-slate-200 dark:stroke-slate-800" />)}
@@ -140,11 +140,10 @@ export function ProjectSandbox({ title = "Data pipeline", className = "" }: Proj
 
         <div className="flex flex-wrap gap-2">
           <button type="button" className={buttonClass} onClick={() => {
-            if (playing) setPlaying(false);
-            else { setStage("Raw"); setPlaying(true); }
+            setStage("Raw"); setPlaying(true);
           }}>
-            {playing ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
-            {playing ? "Pause walkthrough" : "Play walkthrough"}
+            <Play aria-hidden="true" className="size-4" />
+            Replay walkthrough
           </button>
           <button type="button" className={buttonClass} onClick={() => selectStage("Raw")}>
             <RotateCcw aria-hidden="true" className="size-4" />Reset

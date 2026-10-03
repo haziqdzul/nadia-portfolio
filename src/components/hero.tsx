@@ -7,10 +7,13 @@ import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 import { InteractiveLab } from "./interactive-lab";
 import { HeroIntro } from "./hero-intro";
 import { PolicyContext } from "./policy-simulator";
+import { FloatingInsights } from "./floating-insights";
 import { PipelineCover } from "./pipeline-cover";
 import { RevenueStory } from "./revenue-story";
 
 export function Hero() {
+  const [actionsHovered, setActionsHovered] = useState(false);
+  const [actionsFocused, setActionsFocused] = useState(false);
   const [labIndex, setLabIndex] = useState(0);
   const [labsOpen, setLabsOpen] = useState(false);
   const [advanced, setAdvanced] = useState(false);
@@ -22,8 +25,8 @@ export function Hero() {
   }
   
   return (
-    <section aria-labelledby="hero-heading" className="relative border-b border-slate-200 dark:border-slate-800">
-      <div className="mx-auto max-w-6xl px-6 pb-12 pt-16 sm:pt-24 lg:pt-28">
+    <section aria-labelledby="hero-heading" className="hero-section relative border-b border-slate-200 dark:border-slate-800">
+      <div className="hero-shell mx-auto max-w-6xl px-6 pb-12 pt-16 sm:pt-24 lg:pt-28">
         
         {/* Parent layout grid wrapper */}
         <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-20">
@@ -39,7 +42,7 @@ export function Hero() {
             </p>
             
             {/* Action Buttons Container */}
-            <div className="mt-6 flex flex-wrap items-center gap-4 w-full">
+            <div onMouseEnter={() => setActionsHovered(true)} onMouseLeave={() => setActionsHovered(false)} onFocusCapture={() => setActionsFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActionsFocused(false); }} className="mt-6 flex flex-wrap items-center gap-4 w-full">
               <Link href="#portfolio" className="action-button">
                 Explore my work <ArrowDownRight aria-hidden="true" className="size-4" />
               </Link>
@@ -100,8 +103,9 @@ export function Hero() {
           </div>
           
           {/* Right Side Canvas Component */}
-          <div ref={labArea} className="min-w-0 self-start">
+          <div ref={labArea} className="flex min-w-0 flex-col self-stretch">
             <div data-cover hidden={labsOpen}><PipelineCover active={!labsOpen} onOpen={() => toggleLabs(true)} /></div>
+            {!labsOpen && <FloatingInsights engaged={actionsHovered || actionsFocused} />}
             <div hidden={!labsOpen}>
               <button data-back-cover type="button" onClick={() => toggleLabs(false)} className="mb-3 min-h-11 text-sm font-semibold text-emerald-800 dark:text-emerald-300">← Back to pipeline</button>
               <div hidden={advanced}><RevenueStory onAdvanced={() => setAdvanced(true)} /></div>
@@ -117,6 +121,9 @@ export function Hero() {
     </section>
   );
 }
+
+
+
 
 
 

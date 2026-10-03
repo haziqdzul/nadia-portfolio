@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Pause, Play } from "lucide-react";
+import { useInteractionPause } from "./use-interaction-pause";
+
 
 const topics = [
   "Python & APIs",
@@ -14,9 +14,9 @@ type CurrentlyBuildingProps = Readonly<{
 }>;
 
 export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
-  const [paused, setPaused] = useState(false);
+  const { paused, handlers } = useInteractionPause();
   return (
-    <aside
+    <aside {...handlers} tabIndex={0}
       aria-label="Currently building"
       className={`flex flex-col gap-4 rounded-xl border border-emerald-200/70 bg-white/75 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 dark:border-slate-700 dark:bg-slate-950/60 ${className}`}
     >
@@ -45,14 +45,7 @@ export function CurrentlyBuilding({ className = "" }: CurrentlyBuildingProps) {
           </li>
         ))}
       </ul>
-      <button
-        type="button"
-        onClick={() => setPaused((value) => !value)}
-        aria-label={paused ? "Play progress animation" : "Pause progress animation"}
-        className="flex size-11 shrink-0 items-center justify-center self-end rounded-full text-emerald-800 transition-colors hover:bg-emerald-50 sm:ml-auto sm:self-auto dark:text-emerald-300 dark:hover:bg-emerald-950 motion-reduce:hidden"
-      >
-        {paused ? <Play aria-hidden="true" className="size-4" /> : <Pause aria-hidden="true" className="size-4" />}
-      </button>
+
     </aside>
   );
 }

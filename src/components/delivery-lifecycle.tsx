@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
-import { Pause, Play } from "lucide-react";
+import { useInteractionPause } from "./use-interaction-pause";
 
 export type LifecycleStage = Readonly<{
   title: string;
@@ -80,6 +80,7 @@ const getServerSnapshot = () => false;
 
 export function DeliveryLifecycle() {
   const id = useId();
+  const { paused, handlers } = useInteractionPause();
   const sectionRef = useRef<HTMLElement>(null);
   const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const inView = useInView(sectionRef, { amount: 0.2 });
@@ -88,7 +89,7 @@ export function DeliveryLifecycle() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [playback, setPlayback] = useState<boolean | null>(null);
   // Autoplay after hydration unless reduced motion is preferred; manual controls override it.
-  const isPlaying = hydrated && (playback ?? reducedMotion === false);
+  const isPlaying = !paused && hydrated && (playback ?? reducedMotion === false);
   const stage = lifecycleStages[activeIndex];
 
   useEffect(() => {
@@ -135,18 +136,12 @@ export function DeliveryLifecycle() {
         <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-zinc-400">02 / How I work</p>
         <div className="mb-9 flex flex-wrap items-end justify-between gap-6">
           <h2 id={`${id}-heading`} className="section-heading">My contribution across the delivery lifecycle</h2>
-          <div className="flex shrink-0 items-center gap-3">
-            <span className="flex items-center gap-2 text-xs text-slate-600 dark:text-zinc-400"><span aria-hidden="true" className={`size-1.5 rounded-full ${isPlaying ? "bg-emerald-600 dark:bg-emerald-300" : "bg-zinc-500"}`} />{isPlaying ? "Auto-playing" : "Paused"}</span>
-            <button type="button" onClick={() => setPlayback(!isPlaying)} aria-controls={`${id}-panel`} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white dark:border-white/15 dark:bg-white/5 px-4 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 motion-reduce:transition-none">
-              {isPlaying ? <Pause aria-hidden="true" className="size-3.5" /> : <Play aria-hidden="true" className="size-3.5" />}
-              {isPlaying ? "Pause" : "Play"}
-            </button>
-          </div>
+
         </div>
 
         <div className="grid items-start gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,2fr)]">
-          <ol aria-label="Delivery lifecycle stages" className="relative space-y-1">
-            <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-6 top-6 w-px bg-slate-200 dark:bg-white/10">
+          <ol aria-label="Delivery lifecycle stages" className="relative space-y-2 md:mt-[56px]">
+            <li aria-hidden="true" className="pointer-events-none absolute bottom-6 left-[30px] top-6 w-px bg-slate-200 dark:bg-white/10">
               <span className="block w-full origin-top bg-emerald-600/70 dark:bg-emerald-300/70 transition-[height] duration-300 motion-reduce:transition-none" style={{ height: `${activeIndex / (lifecycleStages.length - 1) * 100}%` }} />
             </li>
             {lifecycleStages.map((item, index) => (
@@ -159,7 +154,7 @@ export function DeliveryLifecycle() {
                   onClick={() => selectStep(index)}
                   onFocus={() => setPlayback(false)}
                   onKeyDown={(event) => handleStepKey(event, index)}
-                  className={`flex min-h-12 w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 motion-reduce:transition-none ${index === activeIndex ? "bg-emerald-100/80 font-semibold text-slate-950 dark:bg-white/[0.07] dark:text-white" : "text-slate-600 dark:text-zinc-400 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/[0.04] dark:hover:text-zinc-200"}`}
+                  className={`flex min-h-12 w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 motion-reduce:transition-none ${index === activeIndex ? "bg-emerald-100/80 font-semibold text-slate-950 dark:bg-white/[0.07] dark:text-white" : "font-medium text-slate-600 dark:text-zinc-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/[0.04] dark:hover:text-zinc-200"}`}
                 >
                   <span aria-hidden="true" className={`relative flex size-7 shrink-0 items-center justify-center rounded-full border font-mono text-xs ${index === activeIndex ? "border-emerald-700 bg-emerald-700 text-white dark:border-emerald-200 dark:bg-emerald-200 dark:text-[#0b0f17]" : "border-emerald-700/40 bg-slate-50 text-emerald-800 dark:border-emerald-200/35 dark:bg-[#0b0f17] dark:text-emerald-200/80"}`}>{index + 1}</span>
                   <span><span className="sr-only">Step {index + 1}: </span>{item.title}</span>
@@ -168,22 +163,27 @@ export function DeliveryLifecycle() {
             ))}
           </ol>
 
+          <div {...handlers} className="min-w-0">
+          <div className="mb-3 flex min-h-11 flex-wrap items-center justify-end gap-3">
+            <span className="flex items-center gap-2 text-xs text-slate-600 dark:text-zinc-400"><span aria-hidden="true" className={`size-1.5 rounded-full ${isPlaying ? "bg-emerald-600 dark:bg-emerald-300" : "bg-zinc-500"}`} />{isPlaying ? "Auto-playing" : "Paused"}</span>
+
+          </div>
           <div id={`${id}-panel`} role="region" aria-label="Selected lifecycle stage" tabIndex={0} onFocus={() => setPlayback(false)} className="relative isolate min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-[#141e22] p-6 shadow-xl shadow-slate-900/5 dark:shadow-black/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700 dark:focus-visible:outline-emerald-300 sm:p-8">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 text-emerald-900 opacity-[0.045] dark:text-emerald-200 dark:opacity-[0.035]" style={{ backgroundImage: "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-            <motion.div key={activeIndex} initial={!hydrated || reducedMotion ? false : { opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : 0.24, ease: "easeOut" }} className="relative min-h-[25rem]">
-              <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-3 select-none font-mono text-7xl font-bold tracking-tighter text-emerald-900/[0.07] dark:text-emerald-200/[0.07] sm:text-8xl">{String(activeIndex + 1).padStart(2, "0")}</span>
+            <motion.div key={activeIndex} initial={!hydrated || reducedMotion ? false : { opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : 0.24, ease: "easeOut" }} className="relative isolate min-h-[25rem]">
+              <span aria-hidden="true" className="pointer-events-none absolute right-0 top-0 -z-10 select-none font-mono text-7xl font-bold tracking-tighter text-emerald-900/[0.05] dark:text-emerald-200/[0.05] sm:text-8xl">{String(activeIndex + 1).padStart(2, "0")}</span>
               <p className="relative font-mono text-xs uppercase tracking-[0.16em] text-emerald-800 dark:text-emerald-200/80">Stage {activeIndex + 1} of {lifecycleStages.length}</p>
               <h3 className="relative mt-3 max-w-lg text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">{stage.title}</h3>
               <p className="mt-3 text-xs font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-200/70">{stage.tagline}</p>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 dark:text-zinc-300 sm:text-base">{stage.description}</p>
-              <div className="mt-8 grid gap-7 border-t border-slate-200 dark:border-white/10 pt-6 sm:grid-cols-2">
+              <div className="lifecycle-delivery mt-8 grid gap-7 border-t border-slate-200 dark:border-slate-600/50 pt-6 sm:grid-cols-2">
                 {([
                   ["What I deliver", stage.deliverables],
                   ["Where I've done it", stage.experienceMilestones],
                 ] as const).map(([heading, items]) => (
                   <div key={heading}>
                     <h4 className="font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-slate-600 dark:text-zinc-400">{heading}</h4>
-                    <ul className="mt-3 space-y-3">{items.map((item) => <li key={item} className="flex gap-2.5 text-sm leading-6 text-slate-700 dark:text-zinc-200"><span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-[1px] bg-emerald-700 dark:bg-emerald-200/80" />{item}</li>)}</ul>
+                    <ul className="mt-3 space-y-3">{items.map((item) => <li key={item} className="flex items-start gap-3 text-sm leading-6 text-slate-700 dark:text-zinc-200"><span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-[1px] bg-emerald-700 dark:bg-emerald-200/80" /><span className="min-w-0">{item}</span></li>)}</ul>
                   </div>
                 ))}
               </div>
@@ -194,9 +194,11 @@ export function DeliveryLifecycle() {
             </motion.div>
           </div>
         </div>
+        </div>
         <p className="sr-only" role="status" aria-live={isPlaying ? "off" : "polite"} aria-atomic="true">Stage {activeIndex + 1} of {lifecycleStages.length}: {stage.title}</p>
       </div>
     </section>
   );
 }
+
 

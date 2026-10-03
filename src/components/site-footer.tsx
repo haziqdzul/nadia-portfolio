@@ -1,13 +1,14 @@
+import { BrandMark } from "./brand-mark";
 import { ArrowUp } from "lucide-react";
 
 export function SiteFooter() {
   return (
-    <footer className="bg-slate-50 px-6 py-10 dark:bg-slate-950">
+    <footer className="site-footer px-6 py-6">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-300">
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="size-6 footer-mug"><path d="M18 9h1a3 3 0 0 1 0 6h-1M3 9h15v9a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3Z" /><path className="mug-steam" d="M6 6c-2-2 2-2 0-4" /><path className="mug-steam" d="M10 6c-2-2 2-2 0-4" /><path className="mug-steam" d="M14 6c-2-2 2-2 0-4" /></svg>
+              <BrandMark className="size-8" />
             </span>
             <div>
               <p className="font-heading text-lg font-bold">Nadia Irdina</p>
@@ -18,7 +19,7 @@ export function SiteFooter() {
             <span>Back to the beginning</span> <ArrowUp aria-hidden="true" className="size-4" />
           </a>
         </div>
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
           <p>Made with intention. Powered by matcha.</p>
           <p>Thanks for spending a little time here.</p>
         </div>
@@ -26,3 +27,4 @@ export function SiteFooter() {
     </footer>
   );
 }
+

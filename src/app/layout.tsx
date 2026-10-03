@@ -4,7 +4,9 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { EditorialIntro } from "@/components/editorial-intro";
 import "./globals.css";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +38,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jakarta.variable} portfolio-colorful`}>
         <Providers>
+          <EditorialIntro>
           <a
             href="#main-content"
             className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white focus:not-sr-only"
@@ -49,8 +52,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             <SiteFooter />
           </div>
+          </EditorialIntro>
         </Providers>
       </body>
     </html>
   );
 }
+

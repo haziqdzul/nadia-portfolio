@@ -14,7 +14,7 @@ export function Providers({ children }: ProvidersProps) {
       attribute="class"
       defaultTheme="light"
       enableSystem
-      disableTransitionOnChange
+
     >
       <MotionConfig reducedMotion="user">
         {children}
